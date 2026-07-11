@@ -54,6 +54,11 @@
       gone before dawn. That is what the histories say. The histories are wrong.
     </p>
     <button onclick="startHunt()">BEGIN</button>
+    <br>
+    <button class="hidden" id="resumeBtn" onclick="resumeHunt()"
+      style="background:#2e3742; color:#c9a45c;">
+      RESUME YOUR TRAIL
+    </button>
   </div>
 
   <!-- The four reusable screens the engine drives -->
@@ -161,12 +166,22 @@
       window.scrollTo(0, 0);
     }
 
-    function startHunt() { loadBeat(0); }
+    var SAVE_KEY = 'undermap-ember-ledger-progress';
 
+    function startHunt() {
+      localStorage.removeItem(SAVE_KEY);  // fresh start wipes any old save
+      loadBeat(0);
+    }
+
+    function resumeHunt() {
+      var saved = localStorage.getItem(SAVE_KEY);
+      loadBeat(saved !== null ? parseInt(saved, 10) : 0);
+    }
     function loadBeat(i) {
       if (i >= BEATS.length) { showScreen('endScreen'); return; }
       current = i;
       hintIndex = 0;
+      localStorage.setItem(SAVE_KEY, String(i));  // save progress
       var b = BEATS[i];
       document.getElementById('walkTitle').textContent = b.title;
       document.getElementById('walkDirections').textContent = b.directions;
@@ -292,6 +307,11 @@
     }
 
     function nextBeat() { loadBeat(current + 1); }
+
+    // On page load: if a save exists, reveal the resume button.
+    if (localStorage.getItem(SAVE_KEY) !== null) {
+      document.getElementById('resumeBtn').classList.remove('hidden');
+    }
   </script>
 </body>
 </html>
