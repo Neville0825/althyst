@@ -40,7 +40,6 @@
 <body>
   <a class="back" href="../">&larr; Boston hunts</a>
 
-  <!-- Cover & briefing -->
   <div class="screen" id="cover">
     <h1>THE EMBER LEDGER</h1>
     <p class="meta">
@@ -58,8 +57,8 @@
     </button>
     <br>
     <button id="beginBtn" onclick="startHunt()">BEGIN</button>
+  </div>
 
-  <!-- The four reusable screens the engine drives -->
   <div class="screen hidden" id="walking">
     <h2 id="walkTitle"></h2>
     <p class="story" id="walkDirections"></p>
@@ -67,6 +66,8 @@
     <p class="distance-note" id="distanceNote"></p>
     <div class="arrived hidden" id="arrivedMsg">&#10003; You've arrived, Keeper.</div>
     <button class="hidden" id="arriveBtn" onclick="showStoryScreen()">CONTINUE</button>
+    <br>
+    <button class="hintbtn" id="mapBtn" onclick="openMap()">SHOW ME ON THE MAP</button>
     <button class="devbtn hidden" id="devArrive" onclick="arrive()">[dev] simulate arrival</button>
   </div>
 
@@ -84,6 +85,7 @@
     <br>
     <button onclick="checkAnswer()">SUBMIT</button>
     <p class="wrong hidden" id="wrongMsg">Not quite &mdash; look again.</p>
+    <br>
     <button class="hintbtn" onclick="nextHint()">NEED A HINT?</button>
     <p class="hinttext hidden" id="hintText"></p>
   </div>
@@ -103,8 +105,6 @@
   <script>
     /* ==================================================================
        THE STORY — edit this list to build the hunt.
-       Each beat: where it is, what's said there, what's solved there,
-       and the directions to it. The machinery below never changes.
        ================================================================== */
     var BEATS = [
       {
@@ -157,6 +157,7 @@
     var watchId = null;
     var hintIndex = 0;
     var devMode = window.location.search.indexOf('dev=1') !== -1;
+    var SAVE_KEY = 'undermap-ember-ledger-progress';
 
     function showScreen(id) {
       document.querySelectorAll('.screen').forEach(function (s) { s.classList.add('hidden'); });
@@ -164,7 +165,6 @@
       window.scrollTo(0, 0);
     }
 
-    var SAVE_KEY = 'undermap-ember-ledger-progress';
     function startHunt() {
       if (localStorage.getItem(SAVE_KEY) !== null) {
         var ok = confirm('Start a new trail? Your saved progress will be erased.');
@@ -173,15 +173,17 @@
       localStorage.removeItem(SAVE_KEY);
       loadBeat(0);
     }
+
     function resumeHunt() {
       var saved = localStorage.getItem(SAVE_KEY);
       loadBeat(saved !== null ? parseInt(saved, 10) : 0);
     }
+
     function loadBeat(i) {
       if (i >= BEATS.length) { showScreen('endScreen'); return; }
       current = i;
       hintIndex = 0;
-      localStorage.setItem(SAVE_KEY, String(i));  // save progress
+      localStorage.setItem(SAVE_KEY, String(i));
       var b = BEATS[i];
       document.getElementById('walkTitle').textContent = b.title;
       document.getElementById('walkDirections').textContent = b.directions;
@@ -308,7 +310,12 @@
 
     function nextBeat() { loadBeat(current + 1); }
 
-    // On page load: if a save exists, reveal the resume button.
+    function openMap() {
+      var g = BEATS[current].gps;
+      window.open('https://maps.google.com/?q=' + g.lat + ',' + g.lon, '_blank');
+    }
+
+    // On page load: if a save exists, offer resume and demote BEGIN.
     if (localStorage.getItem(SAVE_KEY) !== null) {
       document.getElementById('resumeBtn').classList.remove('hidden');
       var bb = document.getElementById('beginBtn');
