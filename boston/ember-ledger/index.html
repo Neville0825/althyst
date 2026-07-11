@@ -6,62 +6,41 @@
   <title>The Ember Ledger</title>
   <style>
     body {
-      background: #14181d;
-      color: #d8e2ec;
-      font-family: Georgia, serif;
-      margin: 0;
-      padding: 40px 20px;
-      text-align: center;
+      background: #14181d; color: #d8e2ec; font-family: Georgia, serif;
+      margin: 0; padding: 40px 20px; text-align: center;
     }
-    .back {
-      display: block;
-      color: #7d8fa3;
-      text-decoration: none;
-      margin-bottom: 24px;
-      font-size: 0.95em;
-    }
+    .back { display:block; color:#7d8fa3; text-decoration:none; margin-bottom:24px; font-size:0.95em; }
     h1 { font-size: 1.9em; letter-spacing: 3px; color: #c9a45c; }
+    h2 { font-size: 1.3em; letter-spacing: 2px; color: #c9a45c; }
     .screen { max-width: 460px; margin: 0 auto; }
-    .story { text-align: left; line-height: 1.7; font-size: 1.05em; }
-    .meta { color: #7d8fa3; font-size: 0.9em; margin: 24px 0; line-height: 1.6; }
+    .story { text-align:left; line-height:1.7; font-size:1.05em; }
+    .meta { color:#7d8fa3; font-size:0.9em; margin:24px 0; line-height:1.6; }
     button {
-      background: #c9a45c;
-      color: #14181d;
-      border: none;
-      border-radius: 10px;
-      padding: 16px 36px;
-      font-size: 1.1em;
-      font-family: Georgia, serif;
-      letter-spacing: 1px;
-      margin-top: 20px;
+      background:#c9a45c; color:#14181d; border:none; border-radius:10px;
+      padding:16px 36px; font-size:1.05em; font-family:Georgia,serif;
+      letter-spacing:1px; margin-top:20px;
     }
-    button:active { background: #b08d45; }
-    .hidden { display: none; }
-    .distance {
-      font-size: 1.6em;
-      color: #c9a45c;
-      margin: 30px 0 10px 0;
-      letter-spacing: 1px;
+    button:active { background:#b08d45; }
+    .hidden { display:none; }
+    .distance { font-size:1.6em; color:#c9a45c; margin:30px 0 10px; }
+    .distance-note { color:#7d8fa3; font-size:0.85em; }
+    .devbtn { background:#2e3742; color:#7d8fa3; font-size:0.85em; padding:10px 18px; margin-top:40px; }
+    .arrived { color:#8fd18f; font-size:1.3em; margin-top:30px; }
+    .transcript { color:#7d8fa3; font-style:italic; text-align:left; line-height:1.7; margin-top:24px; }
+    input[type=text] {
+      width: 90%; padding: 14px; font-size: 1.2em; font-family: Georgia, serif;
+      background:#1e242c; border:1px solid #2e3742; border-radius:10px;
+      color:#d8e2ec; text-align:center; letter-spacing:2px; margin-top:20px;
     }
-    .distance-note { color: #7d8fa3; font-size: 0.85em; }
-    .devbtn {
-      background: #2e3742;
-      color: #7d8fa3;
-      font-size: 0.85em;
-      padding: 10px 18px;
-      margin-top: 40px;
-    }
-    .arrived {
-      color: #8fd18f;
-      font-size: 1.3em;
-      margin-top: 30px;
-    }
+    .wrong { color:#d18f8f; margin-top:12px; }
+    .hintbtn { background:#2e3742; color:#c9a45c; font-size:0.9em; padding:12px 20px; }
+    .hinttext { color:#c9a45c; font-style:italic; margin-top:16px; line-height:1.6; }
   </style>
 </head>
 <body>
   <a class="back" href="../">&larr; Boston hunts</a>
 
-  <!-- SCREEN 1: cover -->
+  <!-- Cover & briefing -->
   <div class="screen" id="cover">
     <h1>THE EMBER LEDGER</h1>
     <p class="meta">
@@ -72,171 +51,247 @@
     <p class="story">
       On a storm-wrecked January night in 1764, Harvard's library burned
       to the ground. Five thousand books &mdash; a century of secrets &mdash;
-      gone before dawn. That is what the histories say.
-      The histories are wrong.
+      gone before dawn. That is what the histories say. The histories are wrong.
     </p>
-    <button onclick="showScreen('briefing')">BEGIN</button>
+    <button onclick="startHunt()">BEGIN</button>
   </div>
 
-  <!-- SCREEN 2: briefing -->
-  <div class="screen hidden" id="briefing">
-    <h1>BEFORE YOU WALK</h1>
-    <p class="story">
-      Make your way to <strong>Harvard Square</strong> &mdash; the plaza
-      outside the T station entrance, by the news kiosk.
-      When you arrive, the trail begins.
-    </p>
-    <p class="meta">
-      You'll need: comfortable shoes, a charged phone,
-      and one earbud or a speaker for voice messages.
-    </p>
-    <button onclick="startWalk()">I'M READY</button>
-  </div>
-
-  <!-- SCREEN 3: walking to the start -->
+  <!-- The four reusable screens the engine drives -->
   <div class="screen hidden" id="walking">
-    <h1>FIND THE KIOSK</h1>
-    <p class="story">
-      Head to the plaza at the Harvard Square T entrance.
-      Your distance updates as you walk.
-    </p>
+    <h2 id="walkTitle"></h2>
+    <p class="story" id="walkDirections"></p>
     <div class="distance" id="distanceText">Locating you&hellip;</div>
     <p class="distance-note" id="distanceNote"></p>
-    <div class="arrived hidden" id="arrivedMsg">
-      &#10003; You've arrived, Keeper.
-    </div>
-    <button class="hidden" id="continueBtn" onclick="showScreen('prologue')">
-      ANSWER THE CALL
-    </button>
-    <button class="devbtn hidden" id="devArrive" onclick="simulateArrival()">
-      [dev] simulate arrival
-    </button>
+    <div class="arrived hidden" id="arrivedMsg">&#10003; You've arrived, Keeper.</div>
+    <button class="hidden" id="arriveBtn" onclick="showStoryScreen()">CONTINUE</button>
+    <button class="devbtn hidden" id="devArrive" onclick="arrive()">[dev] simulate arrival</button>
   </div>
 
-  <!-- SCREEN 4: the prologue -->
-  <div class="screen hidden" id="prologue">
-    <h1>INCOMING CALL</h1>
-    <p class="meta">UNKNOWN NUMBER &middot; CAMBRIDGE, MA</p>
-    <button id="playBtn" onclick="playPrologue()">&#9654; ANSWER</button>
-    <p class="story" id="transcript" style="margin-top:30px; color:#7d8fa3; font-style:italic;"></p>
-    <button class="hidden" id="afterCallBtn" onclick="alert('Chapter 1 continues... next build session!')">
-      CONTINUE
-    </button>
+  <div class="screen hidden" id="storyScreen">
+    <h2 id="storyTitle"></h2>
+    <button id="playBtn" onclick="playVoice()">&#9654; PLAY MESSAGE</button>
+    <p class="transcript hidden" id="transcript"></p>
+    <button class="hidden" id="afterVoiceBtn" onclick="afterVoice()">CONTINUE</button>
   </div>
-  
+
+  <div class="screen hidden" id="puzzleScreen">
+    <h2 id="puzzleTitle"></h2>
+    <p class="story" id="puzzlePrompt"></p>
+    <input type="text" id="answerBox" placeholder="YOUR ANSWER" autocomplete="off">
+    <br>
+    <button onclick="checkAnswer()">SUBMIT</button>
+    <p class="wrong hidden" id="wrongMsg">Not quite &mdash; look again.</p>
+    <button class="hintbtn" onclick="nextHint()">NEED A HINT?</button>
+    <p class="hinttext hidden" id="hintText"></p>
+  </div>
+
+  <div class="screen hidden" id="cardScreen">
+    <h2>THE TRAIL CONTINUES</h2>
+    <p class="story" id="cardText"></p>
+    <button onclick="nextBeat()">WALK ON</button>
+  </div>
+
+  <div class="screen hidden" id="endScreen">
+    <h2>END OF THE BUILT TRAIL</h2>
+    <p class="story">More beats coming soon &mdash; this is where the story
+      currently ends. Well walked, Keeper.</p>
+  </div>
+
   <script>
-    // ---- The game's first target: Harvard Square T plaza ----
-    var TARGET = { lat: 42.3733, lon: -71.1190, radiusMeters: 50 };
+    /* ==================================================================
+       THE STORY — edit this list to build the hunt.
+       Each beat: where it is, what's said there, what's solved there,
+       and the directions to it. The machinery below never changes.
+       ================================================================== */
+    var BEATS = [
+      {
+        title: "THE KIOSK",
+        directions: "Head to the plaza at the Harvard Square T entrance, by the news kiosk.",
+        gps: { lat: 42.3733, lon: -71.1190, radius: 50 },
+        voiceTitle: "INCOMING CALL — UNKNOWN NUMBER",
+        voice: "Don't hang up. You're standing in Harvard Square. I can see the check-in. Good. Listen: in 1764, Harvard's library burned. Every book, gone. That's what the histories say. The histories are wrong. One volume left that building before the flames took it. A ledger of debts and secrets that powerful families needed erased. The woman who saved it walked the same stones you're standing on. I've spent thirty years finding her trail. Today, you're going to walk it. Enter the Yard the way the Keepers commanded: through the gate that tells you why you've come.",
+        puzzle: null,
+        card: "Walk south along Massachusetts Avenue, keeping the Yard's brick wall on your left, until you reach a gate crowned with carved words about wisdom. Read them before you enter."
+      },
+      {
+        title: "DEXTER GATE",
+        directions: "Find the gate on Massachusetts Avenue crowned with carved words about wisdom.",
+        gps: { lat: 42.3722, lon: -71.1167, radius: 40 },
+        voiceTitle: "THE THRESHOLD",
+        voice: "Every secret society needs a front door. The Keepers hid theirs in plain sight. A gate thousands of students pass daily without reading. Above you, the instruction. The Keepers loved that you only understand the price of wisdom after you've entered.",
+        puzzle: {
+          prompt: "The Keepers' password is the last word you read before entering. Speak it.",
+          answers: ["WISDOM"],
+          hints: [
+            "Look up at the stone above the gate's outer arch.",
+            "The final word of the carved sentence.",
+            "The word is WISDOM. The gate accepts you."
+          ]
+        },
+        card: "You've entered the way she fled — in reverse. Walk into the Yard, past the great library steps, until you find the most photographed man in Cambridge: a seated bronze figure, one shoe polished gold by a million hands. The Keepers say he tells three lies."
+      },
+      {
+        title: "THE STATUE OF THREE LIES",
+        directions: "Find the seated bronze figure with one golden shoe.",
+        gps: { lat: 42.3744, lon: -71.1172, radius: 40 },
+        voiceTitle: "THE FIRST LESSON",
+        voice: "Meet John Harvard. Except that's the first lie. The sculptor never saw John Harvard. He used a student as the model. Lie two: the inscription calls him Founder. He wasn't. He was a donor. Lie three: read the date. The college was founded in 1636, not what the pedestal claims. The Keepers adored this statue. Their first lesson: the official record lies. Your job is to find what's true.",
+        puzzle: {
+          prompt: "The pedestal shows a false year. Enter the TRUE year Harvard was founded — the year the ledger's story begins.",
+          answers: ["1636"],
+          hints: [
+            "The date carved on the pedestal is two years too late.",
+            "Subtract two.",
+            "1636 — the truth the statue won't tell you."
+          ]
+        },
+        card: "Now face the truth she faced. From the statue, look northwest across the Old Yard for a stately brick hall with a small bell cupola. That is Harvard Hall — rebuilt on the foundations of the building that burned. (More of the trail is being laid — check back soon.)"
+      }
+    ];
+    /* ================== END OF STORY — machinery below ================== */
+
+    var current = 0;
     var watchId = null;
+    var hintIndex = 0;
+    var devMode = window.location.search.indexOf('dev=1') !== -1;
 
     function showScreen(id) {
-      document.querySelectorAll('.screen').forEach(function (s) {
-        s.classList.add('hidden');
-      });
+      document.querySelectorAll('.screen').forEach(function (s) { s.classList.add('hidden'); });
       document.getElementById(id).classList.remove('hidden');
+      window.scrollTo(0, 0);
     }
 
-    // Distance between two GPS points, in meters (standard formula).
-    function distanceMeters(lat1, lon1, lat2, lon2) {
-      var R = 6371000;
-      var toRad = Math.PI / 180;
-      var dLat = (lat2 - lat1) * toRad;
-      var dLon = (lon2 - lon1) * toRad;
-      var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-              Math.cos(lat1 * toRad) * Math.cos(lat2 * toRad) *
-              Math.sin(dLon / 2) * Math.sin(dLon / 2);
-      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    }
+    function startHunt() { loadBeat(0); }
 
-    function startWalk() {
+    function loadBeat(i) {
+      if (i >= BEATS.length) { showScreen('endScreen'); return; }
+      current = i;
+      hintIndex = 0;
+      var b = BEATS[i];
+      document.getElementById('walkTitle').textContent = b.title;
+      document.getElementById('walkDirections').textContent = b.directions;
+      document.getElementById('distanceText').textContent = 'Locating you\u2026';
+      document.getElementById('distanceText').classList.remove('hidden');
+      document.getElementById('distanceNote').textContent = '';
+      document.getElementById('arrivedMsg').classList.add('hidden');
+      document.getElementById('arriveBtn').classList.add('hidden');
+      if (devMode) document.getElementById('devArrive').classList.remove('hidden');
       showScreen('walking');
+      startGps();
+    }
 
-      // Dev mode: if the address ends with ?dev=1, show the simulate button.
-      if (window.location.search.indexOf('dev=1') !== -1) {
-        document.getElementById('devArrive').classList.remove('hidden');
-      }
-
+    function startGps() {
+      stopGps();
       if (!navigator.geolocation) {
-        document.getElementById('distanceText').textContent =
-          'GPS unavailable on this device.';
+        document.getElementById('distanceText').textContent = 'GPS unavailable.';
         return;
       }
+      watchId = navigator.geolocation.watchPosition(onPosition, onGpsError,
+        { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 });
+    }
 
-      // Ask the phone to report position continuously.
-      watchId = navigator.geolocation.watchPosition(
-        onPosition,
-        onGpsError,
-        { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
-      );
+    function stopGps() {
+      if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+    }
+
+    function distanceMeters(lat1, lon1, lat2, lon2) {
+      var R = 6371000, toRad = Math.PI / 180;
+      var dLat = (lat2 - lat1) * toRad, dLon = (lon2 - lon1) * toRad;
+      var a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+              Math.cos(lat1*toRad)*Math.cos(lat2*toRad)*Math.sin(dLon/2)*Math.sin(dLon/2);
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     }
 
     function onPosition(pos) {
-      var d = distanceMeters(
-        pos.coords.latitude, pos.coords.longitude,
-        TARGET.lat, TARGET.lon
-      );
+      var g = BEATS[current].gps;
+      var d = distanceMeters(pos.coords.latitude, pos.coords.longitude, g.lat, g.lon);
       var el = document.getElementById('distanceText');
       if (d > 2000) {
-        el.textContent = (d / 1000).toFixed(1) + ' km away';
-        document.getElementById('distanceNote').textContent =
-          'A long way from the kiosk \u2014 but the trail will wait.';
+        el.textContent = (d/1000).toFixed(1) + ' km away';
       } else {
         el.textContent = Math.round(d) + ' meters away';
         document.getElementById('distanceNote').textContent =
           d < 200 ? 'Getting warm, Keeper\u2026' : '';
       }
-      if (d <= TARGET.radiusMeters) { arrive(); }
+      if (d <= g.radius) arrive();
     }
 
-    function onGpsError(err) {
+    function onGpsError() {
       document.getElementById('distanceText').textContent =
-        'Location permission needed \u2014 check your browser settings.';
+        'Location permission needed \u2014 check browser settings.';
     }
 
     function arrive() {
-      if (watchId !== null) {
-        navigator.geolocation.clearWatch(watchId);
-        watchId = null;
-      }
+      stopGps();
       document.getElementById('distanceText').classList.add('hidden');
       document.getElementById('arrivedMsg').classList.remove('hidden');
-      document.getElementById('continueBtn').classList.remove('hidden');
+      document.getElementById('arriveBtn').classList.remove('hidden');
     }
 
-    function simulateArrival() { arrive(); }
+    function showStoryScreen() {
+      var b = BEATS[current];
+      document.getElementById('storyTitle').textContent = b.voiceTitle;
+      document.getElementById('playBtn').classList.remove('hidden');
+      document.getElementById('transcript').classList.add('hidden');
+      document.getElementById('afterVoiceBtn').classList.add('hidden');
+      showScreen('storyScreen');
+    }
 
-    // ---- Voice messages ----
-    // For now the phone's built-in narrator reads the script aloud.
-    // Later, each message becomes a real recording: we'll swap
-    // speakLine() for an mp3 file, and nothing else changes.
-
-    var PROLOGUE_TEXT =
-      "Don't hang up. You're standing in Harvard Square. I can see " +
-      "the check-in. Good. Listen: in 1764, Harvard's library burned. " +
-      "Every book, gone. That's what the histories say. The histories " +
-      "are wrong. One volume left that building before the flames took " +
-      "it. A ledger of debts and secrets that powerful families needed " +
-      "erased. The woman who saved it walked the same stones you're " +
-      "standing on. I've spent thirty years finding her trail. " +
-      "Today, you're going to walk it.";
-
-    function playPrologue() {
+    function playVoice() {
+      var b = BEATS[current];
       var t = document.getElementById('transcript');
-      t.textContent = '"' + PROLOGUE_TEXT + '"';
+      t.textContent = '"' + b.voice + '"';
+      t.classList.remove('hidden');
       document.getElementById('playBtn').classList.add('hidden');
-
       if ('speechSynthesis' in window) {
-        var msg = new SpeechSynthesisUtterance(PROLOGUE_TEXT);
-        msg.rate = 0.95;   // slightly slower, more dramatic
+        var msg = new SpeechSynthesisUtterance(b.voice);
+        msg.rate = 0.95;
         msg.onend = function () {
-          document.getElementById('afterCallBtn').classList.remove('hidden');
+          document.getElementById('afterVoiceBtn').classList.remove('hidden');
         };
         speechSynthesis.speak(msg);
       } else {
-        // No speech support: just show the transcript and continue.
-        document.getElementById('afterCallBtn').classList.remove('hidden');
+        document.getElementById('afterVoiceBtn').classList.remove('hidden');
       }
     }
+
+    function afterVoice() {
+      var b = BEATS[current];
+      if (b.puzzle) { showPuzzle(); } else { showCard(); }
+    }
+
+    function showPuzzle() {
+      var b = BEATS[current];
+      document.getElementById('puzzleTitle').textContent = b.title;
+      document.getElementById('puzzlePrompt').textContent = b.puzzle.prompt;
+      document.getElementById('answerBox').value = '';
+      document.getElementById('wrongMsg').classList.add('hidden');
+      document.getElementById('hintText').classList.add('hidden');
+      showScreen('puzzleScreen');
+    }
+
+    function checkAnswer() {
+      var b = BEATS[current];
+      var guess = document.getElementById('answerBox').value.trim().toUpperCase();
+      var ok = b.puzzle.answers.some(function (a) { return guess === a.toUpperCase(); });
+      if (ok) { showCard(); }
+      else { document.getElementById('wrongMsg').classList.remove('hidden'); }
+    }
+
+    function nextHint() {
+      var hints = BEATS[current].puzzle.hints;
+      var el = document.getElementById('hintText');
+      el.textContent = hints[Math.min(hintIndex, hints.length - 1)];
+      el.classList.remove('hidden');
+      if (hintIndex < hints.length - 1) hintIndex++;
+    }
+
+    function showCard() {
+      document.getElementById('cardText').textContent = BEATS[current].card;
+      showScreen('cardScreen');
+    }
+
+    function nextBeat() { loadBeat(current + 1); }
   </script>
 </body>
 </html>
