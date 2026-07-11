@@ -113,17 +113,17 @@
     </button>
   </div>
 
-  <!-- SCREEN 4: the prologue placeholder -->
+  <!-- SCREEN 4: the prologue -->
   <div class="screen hidden" id="prologue">
-    <h1>THE PHONE RINGS</h1>
-    <p class="story">
-      "Don't hang up. You're standing in Harvard Square &mdash;
-      I can see the check-in&hellip;"
-    </p>
-    <p class="meta">(Professor Quill's voice message plays here &mdash;
-      audio is our next build step.)</p>
+    <h1>INCOMING CALL</h1>
+    <p class="meta">UNKNOWN NUMBER &middot; CAMBRIDGE, MA</p>
+    <button id="playBtn" onclick="playPrologue()">&#9654; ANSWER</button>
+    <p class="story" id="transcript" style="margin-top:30px; color:#7d8fa3; font-style:italic;"></p>
+    <button class="hidden" id="afterCallBtn" onclick="alert('Chapter 1 continues... next build session!')">
+      CONTINUE
+    </button>
   </div>
-
+  
   <script>
     // ---- The game's first target: Harvard Square T plaza ----
     var TARGET = { lat: 42.3733, lon: -71.1190, radiusMeters: 50 };
