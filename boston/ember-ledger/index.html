@@ -204,6 +204,39 @@
     }
 
     function simulateArrival() { arrive(); }
+
+    // ---- Voice messages ----
+    // For now the phone's built-in narrator reads the script aloud.
+    // Later, each message becomes a real recording: we'll swap
+    // speakLine() for an mp3 file, and nothing else changes.
+
+    var PROLOGUE_TEXT =
+      "Don't hang up. You're standing in Harvard Square. I can see " +
+      "the check-in. Good. Listen: in 1764, Harvard's library burned. " +
+      "Every book, gone. That's what the histories say. The histories " +
+      "are wrong. One volume left that building before the flames took " +
+      "it. A ledger of debts and secrets that powerful families needed " +
+      "erased. The woman who saved it walked the same stones you're " +
+      "standing on. I've spent thirty years finding her trail. " +
+      "Today, you're going to walk it.";
+
+    function playPrologue() {
+      var t = document.getElementById('transcript');
+      t.textContent = '"' + PROLOGUE_TEXT + '"';
+      document.getElementById('playBtn').classList.add('hidden');
+
+      if ('speechSynthesis' in window) {
+        var msg = new SpeechSynthesisUtterance(PROLOGUE_TEXT);
+        msg.rate = 0.95;   // slightly slower, more dramatic
+        msg.onend = function () {
+          document.getElementById('afterCallBtn').classList.remove('hidden');
+        };
+        speechSynthesis.speak(msg);
+      } else {
+        // No speech support: just show the transcript and continue.
+        document.getElementById('afterCallBtn').classList.remove('hidden');
+      }
+    }
   </script>
 </body>
 </html>
