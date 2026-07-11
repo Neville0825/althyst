@@ -165,12 +165,14 @@
     }
 
     var SAVE_KEY = 'undermap-ember-ledger-progress';
-
     function startHunt() {
-      localStorage.removeItem(SAVE_KEY);  // fresh start wipes any old save
+      if (localStorage.getItem(SAVE_KEY) !== null) {
+        var ok = confirm('Start a new trail? Your saved progress will be erased.');
+        if (!ok) return;
+      }
+      localStorage.removeItem(SAVE_KEY);
       loadBeat(0);
     }
-
     function resumeHunt() {
       var saved = localStorage.getItem(SAVE_KEY);
       loadBeat(saved !== null ? parseInt(saved, 10) : 0);
@@ -309,6 +311,11 @@
     // On page load: if a save exists, reveal the resume button.
     if (localStorage.getItem(SAVE_KEY) !== null) {
       document.getElementById('resumeBtn').classList.remove('hidden');
+      var bb = document.getElementById('beginBtn');
+      bb.textContent = 'START A NEW TRAIL';
+      bb.style.background = '#2e3742';
+      bb.style.color = '#7d8fa3';
+      bb.style.fontSize = '0.9em';
     }
   </script>
 </body>
