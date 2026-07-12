@@ -35,6 +35,12 @@
     .wrong { color:#d18f8f; margin-top:12px; }
     .hintbtn { background:#2e3742; color:#c9a45c; font-size:0.9em; padding:12px 20px; }
     .hinttext { color:#c9a45c; font-style:italic; margin-top:16px; line-height:1.6; }
+    .placeholder {
+      border: 2px dashed #c9a45c; border-radius: 12px;
+      padding: 60px 20px; margin: 30px auto; max-width: 280px;
+      color: #c9a45c; letter-spacing: 2px; font-size: 1.1em;
+    }
+    .revealCaption { color:#7d8fa3; font-style:italic; line-height:1.6; }
   </style>
 </head>
 <body>
@@ -88,6 +94,13 @@
     <br>
     <button class="hintbtn" onclick="nextHint()">NEED A HINT?</button>
     <p class="hinttext hidden" id="hintText"></p>
+  </div>
+
+  <div class="screen hidden" id="revealScreen">
+    <h2 id="revealTitle"></h2>
+    <div class="placeholder" id="revealImage"></div>
+    <p class="revealCaption" id="revealCaption"></p>
+    <button onclick="showCard()">CONTINUE</button>
   </div>
 
   <div class="screen hidden" id="cardScreen">
@@ -242,6 +255,11 @@
           ]
         },
         card: "",
+        reveal: {
+          title: "FRAGMENT RECOVERED",
+          image: "FRAGMENT 1 PLACEHOLDER",
+          caption: "Burned at the edges. Sealed with the surveyor's mark. Fragment one of the Ember Ledger is yours."
+        },
         chapterEnd: {
           heading: "CHAPTER ONE COMPLETE",
           text: "You have it. You actually have it. Fragment one of the Ember Ledger — and the name history erased. The college records list her only as 'a servant of the library.' The Keepers knew her name: Constance Reed. The note in the margin says the second fragment went to the garden of the dead, where the Navigator rests. I know where that is. The question is whether you have another journey in you today. It's a short bus or rideshare hop west — or rest, and the trail will keep. Constance waited fifty years. There's no shame in resting. Only in forgetting.",
@@ -296,6 +314,11 @@
             "65. The Navigator lived 65 years — and hid the trail in every one of them."
           ]
         },
+        reveal: {
+          title: "THE SURVEYOR'S MARK",
+          image: "SURVEYOR'S MARK PLACEHOLDER",
+          caption: "The Keepers sign their work. This mark appears wherever a fragment has rested. You will see it again. Remember it."
+        },
         card: "The Navigator's bearing points you to the oldest ground here — older than the cemetery, older than Harvard itself. Make your way back toward the chapel, then follow the path that curves down behind it, descending into a green hollow ringed with trees. At its heart lies a still pool the glaciers left behind. Walk down into the quiet. When you reach the water's edge, wait. Someone will call."
       },
       {
@@ -332,6 +355,11 @@
         voice: "Stand where the living look out over everything the dead protect. From this hill you can see the whole board. Harvard, where it burned. Boston, where the Tories fled. And across the river, the towers of the makers, where the final page waits. You did what pilgrims have always done today. You walked. You read the stones. You kept your voices low among the sleeping. And you found the poet's shadow, and the truth resting inside it. Fragment two is yours.",
         puzzle: null,
         card: "",
+        reveal: {
+          title: "FRAGMENT RECOVERED",
+          image: "FRAGMENT 2 PLACEHOLDER",
+          caption: "Pulled from the garden of the dead. The surveyor's mark again, fainter this time. Fragment two of the Ember Ledger is yours."
+        },
         chapterEnd: {
           heading: "CHAPTER TWO COMPLETE",
           text: "Two fragments of the Ember Ledger ride in your pocket — more than anyone has held since Longfellow himself. The Keepers had a phrase for travelers like you: worthy of the road. The final page lies with the makers of new things — a bus or rideshare back to Harvard Square, then the Red Line east. Continue... or return another day? The ledger has waited 250 years. It can wait for you.",
@@ -440,6 +468,11 @@
           ]
         },
         card: "",
+        reveal: {
+          title: "THE FINAL FRAGMENT",
+          image: "FRAGMENT 3 PLACEHOLDER",
+          caption: "The last page. The mark is bold here — Marsh wanted it seen. Three fragments. The Ember Ledger, whole again after 260 years."
+        },
         chapterEnd: {
           heading: "THE EMBER LEDGER — COMPLETE",
           finale: true,
@@ -571,9 +604,20 @@
 
     function afterVoice() {
       var b = BEATS[current];
-      if (b.puzzle) { showPuzzle(); } else { showCard(); }
+      if (b.puzzle) { showPuzzle(); } else { proceedAfterSolve(); }
     }
 
+    function proceedAfterSolve() {
+      var b = BEATS[current];
+      if (b.reveal) {
+        document.getElementById('revealTitle').textContent = b.reveal.title;
+        document.getElementById('revealImage').textContent = b.reveal.image;
+        document.getElementById('revealCaption').textContent = b.reveal.caption;
+        showScreen('revealScreen');
+        return;
+      }
+      showCard();
+    }
     function showPuzzle() {
       var b = BEATS[current];
       document.getElementById('puzzleTitle').textContent = b.title;
@@ -588,7 +632,7 @@
       var b = BEATS[current];
       var guess = document.getElementById('answerBox').value.trim().toUpperCase();
       var ok = b.puzzle.answers.some(function (a) { return guess === a.toUpperCase(); });
-      if (ok) { showCard(); }
+     if (ok) { proceedAfterSolve(); }
       else { document.getElementById('wrongMsg').classList.remove('hidden'); }
     }
 
