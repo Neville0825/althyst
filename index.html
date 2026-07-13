@@ -40,6 +40,37 @@
       margin-top: 4px;
       letter-spacing: 2px;
     }
+    .orient {
+      max-width: 400px;
+      margin: -20px auto 24px auto;
+      color: #a8b6c4;
+      font-size: 0.95em;
+      line-height: 1.6;
+    }
+    .howit { max-width: 400px; margin: 0 auto 32px auto; }
+    .howbtn {
+      background: none;
+      border: 1px solid #2e3742;
+      border-radius: 8px;
+      color: #7d8fa3;
+      font-family: Georgia, serif;
+      font-size: 0.85em;
+      letter-spacing: 2px;
+      padding: 10px 20px;
+    }
+    .howsteps {
+      text-align: left;
+      color: #a8b6c4;
+      font-size: 0.95em;
+      line-height: 1.5;
+      background: #1e242c;
+      border: 1px solid #2e3742;
+      border-radius: 12px;
+      padding: 6px 20px;
+      margin-top: 12px;
+    }
+    .howfoot { color: #7d8fa3; font-style: italic; font-size: 0.9em; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
@@ -67,5 +98,11 @@
     <a class="city coming-soon" href="#">NEW YORK <span>COMING SOON</span></a>
     <a class="city coming-soon" href="#">CHICAGO <span>COMING SOON</span></a>
   </div>
+<script>
+    // Show/hide the how-it-works steps when the button is tapped.
+    function toggleHow() {
+      document.getElementById('howSteps').classList.toggle('hidden');
+    }
+  </script>
 </body>
 </html>
