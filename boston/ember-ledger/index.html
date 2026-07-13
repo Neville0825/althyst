@@ -35,6 +35,28 @@
     .wrong { color:#d18f8f; margin-top:12px; }
     .hintbtn { background:#2e3742; color:#c9a45c; font-size:0.9em; padding:12px 20px; }
     .hinttext { color:#c9a45c; font-style:italic; margin-top:16px; line-height:1.6; }
+    /* --- Ember ambiance: small sparks drifting up the screen edges --- */
+    .ember {
+      position: fixed;
+      bottom: -10px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #e8964a;
+      box-shadow: 0 0 8px 2px rgba(232, 150, 74, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 5;
+      animation-name: emberRise;
+      animation-timing-function: ease-in;
+      animation-iteration-count: infinite;
+    }
+    @keyframes emberRise {
+      0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+      8%   { opacity: 0.55; }
+      55%  { opacity: 0.35; }
+      100% { transform: translateY(-105vh) translateX(14px) scale(0.4); opacity: 0; }
+    }
     .placeholder {
       border: 2px dashed #c9a45c; border-radius: 12px;
       padding: 60px 20px; margin: 30px auto; max-width: 280px;
@@ -45,6 +67,14 @@
 </head>
 <body>
   <a class="back" href="../">&larr; Boston hunts</a>
+
+  <!-- Ember ambiance: left and right margins only, staggered timing -->
+  <div class="ember" style="left:3%;  animation-duration:9s;  animation-delay:0s;"></div>
+  <div class="ember" style="left:7%;  animation-duration:12s; animation-delay:4s;"></div>
+  <div class="ember" style="left:5%;  animation-duration:10s; animation-delay:8s; width:4px; height:4px;"></div>
+  <div class="ember" style="right:4%; animation-duration:11s; animation-delay:2s;"></div>
+  <div class="ember" style="right:8%; animation-duration:9s;  animation-delay:6s; width:4px; height:4px;"></div>
+  <div class="ember" style="right:6%; animation-duration:13s; animation-delay:10s;"></div>
 
   <div class="screen" id="cover">
     <h1>THE EMBER LEDGER</h1>
