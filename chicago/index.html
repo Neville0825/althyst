@@ -1,1 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Althyst — Chicago</title>
+  <style>
+    body {
+      background: #14181d;
+      color: #d8e2ec;
+      font-family: Georgia, serif;
+      margin: 0;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .back {
+      display: block;
+      color: #7d8fa3;
+      text-decoration: none;
+      margin-bottom: 24px;
+      font-size: 0.95em;
+    }
+    h1 { font-size: 2em; letter-spacing: 3px; margin-bottom: 4px; }
+    .tagline { color: #7d8fa3; font-style: italic; margin-bottom: 36px; }
+    .hunt-list { max-width: 420px; margin: 0 auto; }
+    .hunt {
+      display: block;
+      background: #1e242c;
+      border: 1px solid #2e3742;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      color: #d8e2ec;
+      text-decoration: none;
+      text-align: left;
+    }
+    .hunt:active { background: #2a323d; }
+    .hunt .name { font-size: 1.25em; letter-spacing: 1px; }
+    .hunt .where {
+      color: #c9a45c;
+      font-size: 0.85em;
+      letter-spacing: 2px;
+      margin-top: 6px;
+    }
+    .hunt .blurb {
+      color: #7d8fa3;
+      font-size: 0.9em;
+      margin-top: 8px;
+      font-style: italic;
+    }
+    .coming-soon { opacity: 0.35; pointer-events: none; }
+  </style>
+</head>
+<body>
+  <a class="back" href="../">&larr; All cities</a>
+  <h1>CHICAGO</h1>
+  <p class="tagline">Four hunts. One hidden thread.</p>
 
+  <div class="hunt-list">
+    <a class="hunt" href="ember-ledger/">
+      <div class="name">THE EMBER LEDGER</div>
+      <div class="where">STARTS IN HARVARD SQUARE &middot; CAMBRIDGE</div>
+      <div class="blurb">In 1764, Harvard's library burned. One book escaped the flames.</div>
+    </a>
+    <a class="hunt coming-soon" href="#">
+      <div class="name">BACK BAY</div>
+      <div class="where">COMING SOON</div>
+    </a>
+    <a class="hunt coming-soon" href="#">
+      <div class="name">NORTH END</div>
+      <div class="where">COMING SOON</div>
+    </a>
+    <a class="hunt coming-soon" href="#">
+      <div class="name">DOWNTOWN</div>
+      <div class="where">COMING SOON</div>
+    </a>
+  </div>
+</body>
+</html>
