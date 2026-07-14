@@ -1,1 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Phoenix Charter</title>
+  <style>
+    body {
+      background: #14181d; color: #d8e2ec; font-family: Georgia, serif;
+      margin: 0; padding: 40px 20px; text-align: center;
+    }
+    .back { display:block; color:#7d8fa3; text-decoration:none; margin-bottom:24px; font-size:0.95em; }
+    h1 { font-size: 1.9em; letter-spacing: 3px; color: #c9a45c; }
+    h2 { font-size: 1.3em; letter-spacing: 2px; color: #c9a45c; }
+    .screen { max-width: 460px; margin: 0 auto; }
+    .story { text-align:left; line-height:1.7; font-size:1.05em; }
+    .meta { color:#7d8fa3; font-size:0.9em; margin:24px 0; line-height:1.6; }
+    button {
+      background:#c9a45c; color:#14181d; border:none; border-radius:10px;
+      padding:16px 36px; font-size:1.05em; font-family:Georgia,serif;
+      letter-spacing:1px; margin-top:20px;
+    }
+    button:active { background:#b08d45; }
+    .hidden { display:none; }
+    .distance { font-size:1.6em; color:#c9a45c; margin:30px 0 10px; }
+    .distance-note { color:#7d8fa3; font-size:0.85em; }
+    .devbtn { background:#2e3742; color:#7d8fa3; font-size:0.85em; padding:10px 18px; margin-top:40px; }
+    .arrived { color:#8fd18f; font-size:1.3em; margin-top:30px; }
+    .transcript { color:#7d8fa3; font-style:italic; text-align:left; line-height:1.7; margin-top:24px; }
+    input[type=text] {
+      width: 90%; padding: 14px; font-size: 1.2em; font-family: Georgia, serif;
+      background:#1e242c; border:1px solid #2e3742; border-radius:10px;
+      color:#d8e2ec; text-align:center; letter-spacing:2px; margin-top:20px;
+    }
+    .wrong { color:#d18f8f; margin-top:12px; }
+    .hintbtn { background:#2e3742; color:#c9a45c; font-size:0.9em; padding:12px 20px; }
+    .hinttext { color:#c9a45c; font-style:italic; margin-top:16px; line-height:1.6; }
+    /* --- Ember ambiance: small sparks drifting up the screen edges --- */
+    .ember {
+      position: fixed;
+      bottom: -10px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #e8964a;
+      box-shadow: 0 0 8px 2px rgba(232, 150, 74, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 5;
+      animation-name: emberRise;
+      animation-timing-function: ease-in;
+      animation-iteration-count: infinite;
+    }
+    @keyframes emberRise {
+      0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+      8%   { opacity: 0.55; }
+      55%  { opacity: 0.35; }
+      100% { transform: translateY(-105vh) translateX(14px) scale(0.4); opacity: 0; }
+    }
+    .placeholder {
+      border: 2px dashed #c9a45c; border-radius: 12px;
+      padding: 60px 20px; margin: 30px auto; max-width: 280px;
+      color: #c9a45c; letter-spacing: 2px; font-size: 1.1em;
+    }
+    .revealCaption { color:#7d8fa3; font-style:italic; line-height:1.6; }
+  </style>
+</head>
+<body>
+  <a class="back" href="../">&larr; Chicago hunts</a>
+
+  <!-- Ember ambiance: left and right margins only, staggered timing -->
+  <div class="ember" style="left:3%;  animation-duration:9s;  animation-delay:0s;"></div>
+  <div class="ember" style="left:7%;  animation-duration:12s; animation-delay:4s;"></div>
+  <div class="ember" style="left:5%;  animation-duration:10s; animation-delay:8s; width:4px; height:4px;"></div>
+  <div class="ember" style="right:4%; animation-duration:11s; animation-delay:2s;"></div>
+  <div class="ember" style="right:8%; animation-duration:9s;  animation-delay:6s; width:4px; height:4px;"></div>
+  <div class="ember" style="right:6%; animation-duration:13s; animation-delay:10s;"></div>
+
+  <div class="screen" id="cover">
+    <h1>THE PHOENIX CHARTER</h1>
+    <p class="meta">
+      Starts at the Cultural Center, the Loop<br>
+      3 chapters &middot; 2 to 6 hours &middot; pause anytime<br>
+      Best for groups of 2&ndash;5 &middot; ages 10+
+    </p>
+    <p class="story">
+      In October 1871, Chicago burned &mdash; and in the vaults beneath the courthouse,
+      the city's memory burned with it. Every deed. Every title. Every record of who
+      owned what. The official cause was a cow, a lantern, a widow. That story was
+      invented by a reporter who later confessed. The men who rebuilt this city knew it.
+      They kept a truer account &mdash; and hid it in plain sight.
+    </p>
+    <button class="hidden" id="resumeBtn" onclick="resumeHunt()">
+      RESUME YOUR TRAIL
+    </button>
+    <br>
+    <button id="beginBtn" onclick="startHunt()">BEGIN</button>
+  </div>
+
+  <div class="screen hidden" id="walking">
+    <h2 id="walkTitle"></h2>
+    <p class="story" id="walkDirections"></p>
+    <div class="distance" id="distanceText">Locating you&hellip;</div>
+    <p class="distance-note" id="distanceNote"></p>
+    <div class="arrived hidden" id="arrivedMsg">&#10003; You've arrived.</div>
+    <button class="hidden" id="arriveBtn" onclick="showStoryScreen()">CONTINUE</button>
+    <br>
+    <button class="hintbtn" id="mapBtn" onclick="openMap()">SHOW ME ON THE MAP</button>
+    <button class="devbtn hidden" id="devArrive" onclick="arrive()">[dev] simulate arrival</button>
+  </div>
+
+  <div class="screen hidden" id="storyScreen">
+    <h2 id="storyTitle"></h2>
+    <button id="playBtn" onclick="playVoice()">&#9654; PLAY MESSAGE</button>
+    <p class="transcript hidden" id="transcript"></p>
+    <button class="hidden" id="afterVoiceBtn" onclick="afterVoice()">CONTINUE</button>
+  </div>
+
+  <div class="screen hidden" id="puzzleScreen">
+    <h2 id="puzzleTitle"></h2>
+    <p class="story" id="puzzlePrompt"></p>
+    <input type="text" id="answerBox" placeholder="YOUR ANSWER" autocomplete="off">
+    <br>
+    <button onclick="checkAnswer()">SUBMIT</button>
+    <p class="wrong hidden" id="wrongMsg">Not quite &mdash; look again.</p>
+    <br>
+    <button class="hintbtn" onclick="nextHint()">NEED A HINT?</button>
+    <p class="hinttext hidden" id="hintText"></p>
+  </div>
+
+  <div class="screen hidden" id="revealScreen">
+    <h2 id="revealTitle"></h2>
+    <div class="placeholder" id="revealImage"></div>
+    <p class="revealCaption" id="revealCaption"></p>
+    <button onclick="showCard()">CONTINUE</button>
+  </div>
+
+  <div class="screen hidden" id="cardScreen">
+    <h2>THE TRAIL CONTINUES</h2>
+    <p class="story" id="cardText"></p>
+    <button onclick="nextBeat()">WALK ON</button>
+  </div>
+
+  <div class="screen hidden" id="endScreen">
+    <h2>END OF THE BUILT TRAIL</h2>
+    <p class="story">More beats coming soon &mdash; this is where the story
+      currently ends. Well walked.</p>
+  </div>
+
+<div class="screen hidden" id="chapterEnd">
+    <h2 id="chapterEndHeading">CHAPTER COMPLETE</h2>
+    <p class="story" id="chapterEndText"></p>
+    <button id="chapterContinueBtn" onclick="continueChapter()">CONTINUE THE TRAIL</button>
+    <br>
+    <button class="hintbtn" id="chapterStopBtn" onclick="stopForToday()">RETURN ANOTHER DAY</button>
+    <p class="meta hidden" id="farewellText"></p>
+  </div>
+  <script>
+    /* ==================================================================
+       THE STORY — edit this list to build the hunt.
+       THE PHOENIX CHARTER — Chapter 1: "Plain Sight"
+       All GPS coordinates are PROVISIONAL (map-derived). The scouting
+       walk captures the real ones. Puzzles marked VERIFY ON-SITE are
+       written from research, not from standing there.
+       ================================================================== */
+    var BEATS = [
+      {
+        title: "THE THANK-YOU PALACE",
+        directions: "Go to the Chicago Cultural Center, 78 E Washington Street, and stand at the Washington Street steps.",
+        gps: { lat: 41.8837, lon: -87.6249, radius: 50 },
+        voiceTitle: "INCOMING CALL — UNKNOWN NUMBER",
+        voice: "You picked up. Good — that's the first trick, and you passed. My name's Sal Faro. I do card magic in a bar three nights a week, and I am, as far as I know, the last man alive holding the first page of a very old trail. Look up at that palace in front of you. In 1871 this city burned to the ground — and the world answered with books. England alone sent thousands. Even the Queen signed one. Chicago built its first public library out of a fire's ashes and other people's kindness, and this marble palace is the thank-you note. The people who rebuilt this city hid something in it. Not in the library. In the city itself. My teacher's teacher called them the Draughtsmen. Today you're walking their roll call. Head for the corner where the whole Loop checks its watch.",
+        puzzle: null,
+        card: "Walk west on Washington Street, away from the lake, until you reach State Street — 'that great street,' the old song says. On the corner stands a grand old department store palace, and hanging over the sidewalk, a clock the size of a wagon wheel, green as weathered bronze. Meet the Loop's oldest timekeeper."
+      },
+      {
+        title: "THE TIMEKEEPER",
+        directions: "Walk west on Washington Street to State Street. Find the great green clock hanging over the sidewalk at the corner of the old department store.",
+        gps: { lat: 41.8830, lon: -87.6277, radius: 50 },
+        voiceTitle: "THE TIMEKEEPER",
+        voice: "Marshall Field's — the store that taught the world how to shop, in the building that taught State Street how to be State Street. The store you see rose after the Fire took the first one. And those great green clocks? For more than a century, this is where Chicago agreed to meet. Under the clock — that's all you had to say. The Draughtsmen said it too. They just never said which one. That was the test. A stranger knows the clock. A Draughtsman knows the clocks.",
+        puzzle: {
+          // VERIFY ON-SITE: both clocks (Washington and Randolph corners) present, visible, no scaffolding.
+          prompt: "From Wren's notebook, the Draughtsmen's first test:\n\n'My face tells no lies, though I have more than one.\nThe stranger meets me at a corner and thinks his errand done.\nWalk my palace end to end, and prove you looked at all —\nhow many of me keep the time along this great street's wall?'",
+          answers: ["2", "TWO"],
+          hints: [
+            "The riddle's speaker is hanging right over your head — and 'more than one' is the whole game. Count them.",
+            "One corner is not the whole story. Walk the store's block north to Randolph. Every corner of this store tells time.",
+            "Two. 'Meet me under the other clock,' they'd say — and only a Draughtsman knew where that was."
+          ]
+        },
+        card: "Stand under the second clock, at the corner of State and Randolph, and face the corner diagonally across from you. You are looking at a ghost. Cross carefully at the crosswalks and stand on that corner — the northeast corner of Randolph and State — with your back to the tower that stands there now."
+      },
+      {
+        title: "THE HALL THAT VANISHED",
+        directions: "Cross to the northeast corner of Randolph and State. Stand with your back to the tower on that corner.",
+        gps: { lat: 41.8847, lon: -87.6274, radius: 50 },
+        voiceTitle: "THE HALL THAT VANISHED",
+        voice: "You are standing where the tallest building in the world once stood. The Masonic Temple. Twenty-two stories, 1892 — so tall that the word skyscraper was practically invented for it. Shops below, offices above, and at the very top, under the roof, the meeting halls. Lodge men met there. And on certain nights, so did the Draughtsmen. The old wreckers' tale says the Temple was cursed from the start. At the groundbreaking, the cornerstone came out wrong — cut too small — and had to be broken apart and relaid in secret. Within the year, two of the men who raised it were dead. In 1939 the city tore the whole thing down for a subway. And today — look around you — not a plaque. Not a mark. The tallest building on Earth, erased from the record. The Draughtsmen lost their hall that year. But a Draughtsman never needed a hall. Only a mark. And you have been walking past it all day.",
+        puzzle: {
+          // VERIFY ON-SITE: is the vertical CHICAGO sign legible from this corner in daylight?
+          prompt: "The ghost's own test, from Wren's notebook:\n\n'I spell one word the whole world knows, standing on one foot in the sky.\nBy night I burn, by day I bleach, and I never once say why.\nThe ghost beside you counted me each evening he walked past —\ncount my pieces, speak the number, and the test is passed.'",
+          answers: ["7", "SEVEN"],
+          hints: [
+            "Look north up State Street. The riddle is standing on end in lights, spelling the one word the whole world knows.",
+            "Count the letters. C-H-I-C-A...",
+            "Seven. Now go stand under them."
+          ]
+        },
+        card: "Walk one block north on State Street toward that sign — the great white theater with the arch like a triumphal gate. Stop across the street from it, on the west sidewalk, where you can take in its whole face at once. Wren called this stop 'the best trick in Chicago.' Cross carefully at the crosswalk."
+      },
+      {
+        title: "HIDDEN IN PLAIN SIGHT",
+        directions: "Stand on the west sidewalk of State Street, across from the Chicago Theatre, where you can see its whole face at once.",
+        gps: { lat: 41.8852, lon: -87.6276, radius: 50 },
+        voiceTitle: "INCOMING CALL — SAL FARO",
+        voice: "Okay. Now I get to do my favorite thing in the world. I get to show you a trick that has been running for a hundred years. Look at that theater. Tourists photograph that sign more than anything in this city. Millions of eyes, every year. Now — here's the secret every magician knows. The best hiding place isn't the shadow. It's the spotlight. Nobody examines what everybody sees. Somewhere on that bright white face, hiding among the lights and the letters, there is a letter that is not a letter. A circle, holding a shape with three arms. Find it. Take your time. It has been waiting a century for someone to actually look.",
+        puzzle: {
+          // VERIFY ON-SITE: exact position of the Municipal Device on the facade/marquee/vertical sign,
+          // and whether it reads clearly from across the street. Tune answers and hints to reality.
+          prompt: "Wren's favorite test — he called it 'the hundred-year trick':\n\n'I am a letter in no alphabet, a river in no sea,\nthree arms inside a perfect ring where all the world can see.\nA million eyes a year wash over me without a trace of doubt —\nI hide inside the spotlight. Name the place you picked me out.'",
+          answers: ["MARQUEE", "THE MARQUEE", "ON THE MARQUEE", "ABOVE THE MARQUEE", "SIGN", "THE SIGN", "IN THE SIGN", "ON THE SIGN", "THE CHICAGO SIGN"],
+          hints: [
+            "A letter in no alphabet: a shape like a Y, held inside a circle. It is hiding somewhere on the theater's bright face.",
+            "Stop reading the sign and start looking at it — the ornament around and above the city's name.",
+            "There — the Y inside a circle, riding on the marquee. You have walked past it a hundred times."
+          ]
+        },
+        reveal: {
+          title: "THE DRAUGHTSMAN'S MARK",
+          image: "DRAUGHTSMAN'S MARK PLACEHOLDER",
+          caption: "The mark of the Draughtsmen. Three arms in a ring. The city thinks it is only decoration. Remember it — you will see it again."
+        },
+        card: "Now the trail turns quiet. Walk to the corner and go west on Lake Street one short block, then turn left onto Dearborn. Partway down the block, an alley opens on your left, running back toward State — a plain brick canyon behind the theaters. Its name is Couch Place. Stop at its mouth. Lower your voice before you enter; you will understand why in a moment. Stay on the through-path, and please do not touch the walls or the doors. People work behind them, and this ground remembers."
+      },
+      {
+        title: "THE NIGHT THE OATH BROKE",
+        directions: "Find Couch Place — the alley behind the theaters, running between Dearborn and State. Stand at its mouth. Speak softly here, stay on the path, and touch nothing.",
+        gps: { lat: 41.8851, lon: -87.6287, radius: 40 },
+        voiceTitle: "THE NIGHT THE OATH BROKE",
+        voice: "December 30th, 1903. The theater that stood here was five weeks old, and its posters called it absolutely fireproof. The official record lied. That afternoon, during a matinee full of families on holiday break, fire broke out — and more than six hundred people never went home. It remains the deadliest single-building fire in American history. The Draughtsmen had sworn an oath in the ashes of 1871. Never again. This alley is where their oath broke, and where the society's heart broke with it. They went silent after that winter. But hear the rest, because it matters. The whole world learned from this alley. Exit signs. Doors that cannot be locked from the outside. The panic bar under your hand in every theater, every school, every public building on Earth. That is this alley's true memorial. And one theater kid who was here that winter spent the rest of his life making sure of it. His stage name was the Great Wren. Our story runs through him now.",
+        puzzle: {
+          // VERIFY ON-SITE: does the alley or a nearby theater lobby carry a memorial plaque?
+          // If one exists, rebuild this puzzle around reading it — stronger, and equally respectful.
+          prompt: "The alley's own lesson, spoken plainly enough for grief:\n\n'I was born from the worst night this alley ever knew.\nNow I stand between every crowd and every fire, in every public hall on Earth.\nI ask nothing of the frightened — no key, no knob, no second thought.\nI move the way you flee. Which way do I open?'",
+          answers: ["OUT", "OUTWARD", "OUTWARDS", "OUT NOT IN", "PUSH", "THEY PUSH OPEN", "AWAY FROM YOU", "OUTWARD ONLY"],
+          hints: [
+            "The speaker is a door — the kind the law rewrote after that night. Look at the exits around you.",
+            "Think of the bar you push in an emergency. Push, never pull.",
+            "Outward. Every door that opens outward, everywhere in the world, is this alley's memorial."
+          ]
+        },
+        card: "Walk out of the alley the way the light is better, back to the street, and let the sound of the Loop return. Head west on Randolph Street two blocks, until the buildings suddenly stand back from a wide granite plaza. In the middle of it waits fifty feet of steel that has been refusing to explain itself since 1967. You will know it when you see it. Cross carefully at the crosswalks."
+      },
+      {
+        title: "THE UNANSWERABLE",
+        directions: "Walk west on Randolph to Daley Plaza. Stand before the great steel sculpture at its center.",
+        gps: { lat: 41.8842, lon: -87.6300, radius: 60 },
+        voiceTitle: "THE UNANSWERABLE",
+        voice: "Feel better? Good. Meet Chicago's favorite argument. Picasso designed it, shipped it, and refused to be paid for it — and then refused, for the rest of his life, to say what it is. A woman? A bird? An Afghan hound? He never told, and the city eventually stopped asking and started climbing on it, which is very Chicago. The Draughtsmen would have adored this thing. The most looked-at object in the civic square, and the official record has nothing. Sometimes the truest thing a record can do is admit what it does not know. Remember that at the next stop. It is the last lesson before the Charter.",
+        puzzle: {
+          // VERIFY ON-SITE: record the dedication plaque's exact text and placement, then rewrite the
+          // riddle's last line and the answer list to match what the plaque literally says.
+          prompt: "Wren would have loved this one:\n\n'My maker gave me fifty feet of steel and not one word to wear.\nA woman, or a wing, or a hound — the argument's still there.\nThe city carved its best confession on a plate for all to see —\nread what the record dares to say. What name did they give me?'",
+          answers: ["UNTITLED", "NO NAME", "NONE", "NOTHING", "IT HAS NO NAME", "THE PICASSO", "PICASSO", "CHICAGO PICASSO"],
+          hints: [
+            "The speaker is the steel thing towering over you — and its 'confession' is written low, near the base.",
+            "Find the dedication plaque and read exactly what the city calls the sculpture.",
+            "The record admits it has no name. Untitled — the honest answer, carved in bronze."
+          ]
+        },
+        card: "Now turn your back on the sculpture and face west across the plaza. The long grey building with the giant columns, filling the whole block from Randolph to Washington, is City Hall. Walk toward its columns and stop on the sidewalk before them. You are standing on the block where our whole story was born."
+      },
+      {
+        title: "THE BLOCK WHERE THE RECORDS BURNED",
+        directions: "Cross to City Hall — the long grey building with the great columns, filling the block west of the plaza. Stand on the sidewalk before its columns.",
+        gps: { lat: 41.8838, lon: -87.6321, radius: 60 },
+        voiceTitle: "THE BLOCK WHERE THE RECORDS BURNED",
+        voice: "Before City Hall, this block held the courthouse. A limestone palace with a bell in its tower. On the night of October 8th, 1871, that bell rang the fire alarm until the tower itself caught, and at two in the morning it fell through the burning building like a struck gong. The jailers below unlocked the cells and told the prisoners to run. And in the vaults, the city's memory burned. Every deed. Every title. Every record of who owned what in Chicago. Gone in one night. Into that emptiness, men with lawyers walked first. And within days, a newspaper printed the story everyone still knows — the widow, the lantern, the cow. Years later the reporter admitted it. He made it up. The great fire's official cause is a confessed fabrication. That is the fire the Draughtsmen were truly afraid of. Not the one that takes buildings. The one that takes the record. They signed their Charter on this block, in the ashes of the city's memory, and swore to keep a true account. The building before you rose on the same ground. Look at it closely. The Draughtsmen who helped raise it were in mourning by then — and they hung their mark on it upside down.",
+        puzzle: {
+          // VERIFY ON-SITE — THIS IS THE WEAKEST PUZZLE IN THE CHAPTER UNTIL YOU WALK IT.
+          // Confirm exactly where the Municipal Device appears on City Hall / the County Building
+          // and whether any instance is genuinely inverted. Then either (a) tighten this
+          // "where does it hang" answer list to match, or (b) convert to a COUNT (how many marks
+          // along the frieze / how many columns across the face), which the answer box handles
+          // far more reliably than free-text locations.
+          prompt: "From the last page of the notebook's first section:\n\n'You learned my face where it shines in lights, where every stranger stares.\nHere I am dressed in stone and grief; my arms point down, not skyward.\nI have mourned on this house of law and record since the year that it was raised.\nSearch its face and tell the trail — where do I hang my head?'",
+          answers: ["ABOVE THE DOORS", "ABOVE THE DOOR", "OVER THE DOORS", "OVER THE DOOR", "ABOVE THE ENTRANCE", "OVER THE ENTRANCE", "THE ENTRANCE", "THE FACADE", "ON THE FACADE", "THE FRIEZE", "ON THE FRIEZE", "THE COLUMNS", "ON THE COLUMNS"],
+          hints: [
+            "The speaker is the mark you found on the theater — but here it is carved in stone, upside down. Look up, above street level.",
+            "Check the ornament over the entrances and along the band of stone above the columns. Stone carvers put their signatures high.",
+            "Above the entrance, inverted — a covenant in mourning, hanging there since the building rose."
+          ]
+        },
+        card: "",
+        reveal: {
+          title: "CHARTER LEAF RECOVERED",
+          image: "CHARTER LEAF 1 PLACEHOLDER",
+          caption: "Scorched drafting vellum. An oath in a steady hand. And pressed into the corner, three arms in a ring. Leaf one of the Phoenix Charter is yours."
+        },
+        chapterEnd: {
+          heading: "CHAPTER ONE COMPLETE",
+          text: "You have it. The first leaf of the Phoenix Charter — hidden by Wren himself on the block where it was signed. Listen, there's writing on the back. Wren's hand. It says the second leaf went 'to the street where money built its canyon, in the care of the birds.' I know exactly where that is. My teacher took me there once and wouldn't say why. The question is whether you've got another walk in you today. It's ten minutes south on foot — or stop here, and the trail will keep. The Draughtsmen waited a hundred years for somebody to look up. They can wait an afternoon for you.",
+          farewell: "Go on home. You did something today, you know that? A hundred years that leaf sat there, and every tourist in America walked past it. Not you. So you've earned the thing my teacher's teacher never told anybody. The Charter's first signature — the one all the others follow. The histories, when they mention the Draughtsmen at all, call their founder 'the Typesetter.' A compositor at the Tribune who watched the cow story get set in type — and kept the original copy that proved it false. Her name was Nora Plumb. Plumb, like a plumb line. The truest line there is. Leaf one is yours, and the Draughtsmen keep what is given. When you're ready — tomorrow, next month, whenever — the trail picks up where money built its canyon, in the care of the birds. Nora kept her account for forty-two years. She'd tell you the record can wait. It always keeps."
+        }
+      }
+    ];
+    /* ================== END OF STORY — machinery below ================== */
+
+    var current = 0;
+    var watchId = null;
+    var hintIndex = 0;
+    var devMode = window.location.search.indexOf('dev=1') !== -1;
+    var SAVE_KEY = 'althyst-phoenix-charter-progress';
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(function (s) { s.classList.add('hidden'); });
+      document.getElementById(id).classList.remove('hidden');
+      window.scrollTo(0, 0);
+    }
+
+    function startHunt() {
+      if (localStorage.getItem(SAVE_KEY) !== null) {
+        var ok = confirm('Start a new trail? Your saved progress will be erased.');
+        if (!ok) return;
+      }
+      localStorage.removeItem(SAVE_KEY);
+      loadBeat(0);
+    }
+
+    function resumeHunt() {
+      var saved = localStorage.getItem(SAVE_KEY);
+      loadBeat(saved !== null ? parseInt(saved, 10) : 0);
+    }
+
+    function loadBeat(i) {
+      if (i >= BEATS.length) { showScreen('endScreen'); return; }
+      current = i;
+      hintIndex = 0;
+      localStorage.setItem(SAVE_KEY, String(i));
+      var b = BEATS[i];
+      document.getElementById('walkTitle').textContent = b.title;
+      document.getElementById('walkDirections').textContent = b.directions;
+      document.getElementById('distanceText').textContent = 'Locating you\u2026';
+      document.getElementById('distanceText').classList.remove('hidden');
+      document.getElementById('distanceNote').textContent = '';
+      document.getElementById('arrivedMsg').classList.add('hidden');
+      document.getElementById('arriveBtn').classList.add('hidden');
+      if (devMode) document.getElementById('devArrive').classList.remove('hidden');
+      showScreen('walking');
+      startGps();
+    }
+
+    function startGps() {
+      stopGps();
+      if (!navigator.geolocation) {
+        document.getElementById('distanceText').textContent = 'GPS unavailable.';
+        return;
+      }
+      watchId = navigator.geolocation.watchPosition(onPosition, onGpsError,
+        { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 });
+    }
+
+    function stopGps() {
+      if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+    }
+
+    function distanceMeters(lat1, lon1, lat2, lon2) {
+      var R = 6371000, toRad = Math.PI / 180;
+      var dLat = (lat2 - lat1) * toRad, dLon = (lon2 - lon1) * toRad;
+      var a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+              Math.cos(lat1*toRad)*Math.cos(lat2*toRad)*Math.sin(dLon/2)*Math.sin(dLon/2);
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+
+    function onPosition(pos) {
+      var g = BEATS[current].gps;
+      var d = distanceMeters(pos.coords.latitude, pos.coords.longitude, g.lat, g.lon);
+      var el = document.getElementById('distanceText');
+      if (d > 2000) {
+        el.textContent = (d/1000).toFixed(1) + ' km away';
+      } else {
+        el.textContent = Math.round(d) + ' meters away';
+        document.getElementById('distanceNote').textContent =
+          d < 200 ? 'Getting warm\u2026' : '';
+      }
+      if (d <= g.radius) arrive();
+    }
+
+    function onGpsError() {
+      document.getElementById('distanceText').textContent =
+        'Location permission needed \u2014 check browser settings.';
+    }
+
+    function arrive() {
+      stopGps();
+      document.getElementById('distanceText').classList.add('hidden');
+      document.getElementById('arrivedMsg').classList.remove('hidden');
+      document.getElementById('arriveBtn').classList.remove('hidden');
+    }
+
+    function showStoryScreen() {
+      var b = BEATS[current];
+      document.getElementById('storyTitle').textContent = b.voiceTitle;
+      document.getElementById('playBtn').classList.remove('hidden');
+      document.getElementById('transcript').classList.add('hidden');
+      document.getElementById('afterVoiceBtn').classList.add('hidden');
+      showScreen('storyScreen');
+    }
+
+    function playVoice() {
+      var b = BEATS[current];
+      var t = document.getElementById('transcript');
+      t.textContent = '"' + b.voice + '"';
+      t.classList.remove('hidden');
+      document.getElementById('playBtn').classList.add('hidden');
+      if ('speechSynthesis' in window) {
+        var msg = new SpeechSynthesisUtterance(b.voice);
+        msg.rate = 0.95;
+        msg.onend = function () {
+          document.getElementById('afterVoiceBtn').classList.remove('hidden');
+        };
+        speechSynthesis.speak(msg);
+      } else {
+        document.getElementById('afterVoiceBtn').classList.remove('hidden');
+      }
+    }
+
+    function afterVoice() {
+      var b = BEATS[current];
+      if (b.puzzle) { showPuzzle(); } else { proceedAfterSolve(); }
+    }
+
+    function proceedAfterSolve() {
+      var b = BEATS[current];
+      if (b.reveal) {
+        document.getElementById('revealTitle').textContent = b.reveal.title;
+        document.getElementById('revealImage').textContent = b.reveal.image;
+        document.getElementById('revealCaption').textContent = b.reveal.caption;
+        showScreen('revealScreen');
+        return;
+      }
+      showCard();
+    }
+    function showPuzzle() {
+      var b = BEATS[current];
+      document.getElementById('puzzleTitle').textContent = b.title;
+      document.getElementById('puzzlePrompt').textContent = b.puzzle.prompt;
+      document.getElementById('answerBox').value = '';
+      document.getElementById('wrongMsg').classList.add('hidden');
+      document.getElementById('hintText').classList.add('hidden');
+      showScreen('puzzleScreen');
+    }
+
+    function checkAnswer() {
+      var b = BEATS[current];
+      var guess = document.getElementById('answerBox').value.trim().toUpperCase();
+      var ok = b.puzzle.answers.some(function (a) { return guess === a.toUpperCase(); });
+     if (ok) { proceedAfterSolve(); }
+      else { document.getElementById('wrongMsg').classList.remove('hidden'); }
+    }
+
+    function nextHint() {
+      var hints = BEATS[current].puzzle.hints;
+      var el = document.getElementById('hintText');
+      el.textContent = hints[Math.min(hintIndex, hints.length - 1)];
+      el.classList.remove('hidden');
+      if (hintIndex < hints.length - 1) hintIndex++;
+    }
+
+    function showCard() {
+      var b = BEATS[current];
+      if (b.chapterEnd) {
+        document.getElementById('chapterEndHeading').textContent =
+          b.chapterEnd.heading || 'CHAPTER COMPLETE';
+        document.getElementById('chapterEndText').textContent = b.chapterEnd.text;
+        document.getElementById('farewellText').classList.add('hidden');
+        var cb = document.getElementById('chapterContinueBtn');
+        var sb = document.getElementById('chapterStopBtn');
+        if (b.chapterEnd.finale) {
+          cb.classList.add('hidden');
+          sb.textContent = 'CLOSE THE CHARTER';
+        } else {
+          cb.classList.remove('hidden');
+          sb.textContent = 'RETURN ANOTHER DAY';
+        }
+        showScreen('chapterEnd');
+        return;
+      }
+      document.getElementById('cardText').textContent = b.card;
+      showScreen('cardScreen');
+    }
+
+    function continueChapter() { loadBeat(current + 1); }
+
+    function stopForToday() {
+      var b = BEATS[current];
+      localStorage.setItem(SAVE_KEY, String(current + 1));
+      var f = document.getElementById('farewellText');
+      f.textContent = b.chapterEnd.farewell;
+      f.classList.remove('hidden');
+    }
+    function nextBeat() { loadBeat(current + 1); }
+
+    function openMap() {
+      var g = BEATS[current].gps;
+      var a = document.createElement('a');
+      a.href = 'https://maps.google.com/?q=' + g.lat + ',' + g.lon;
+      a.target = '_blank';
+      a.rel = 'noopener';  // detach the new tab — prevents iOS Chrome blanking
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // On page load: if a save exists, offer resume and demote BEGIN.
+    if (localStorage.getItem(SAVE_KEY) !== null) {
+      document.getElementById('resumeBtn').classList.remove('hidden');
+      var bb = document.getElementById('beginBtn');
+      bb.textContent = 'START A NEW TRAIL';
+      bb.style.background = '#2e3742';
+      bb.style.color = '#7d8fa3';
+      bb.style.fontSize = '0.9em';
+    }
+  </script>
+</body>
+</html>
 
