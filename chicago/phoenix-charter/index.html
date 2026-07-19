@@ -24,6 +24,17 @@
       letter-spacing:1px; margin-top:20px;
     }
     button:active { background:#b08d45; }
+    .audiobtn {
+      display:inline-flex; align-items:center; gap:11px;
+      background:#242c35; color:#e6d3a3; border:1px solid #3a444f;
+      border-radius:999px; padding:13px 24px 13px 14px;
+    }
+    .audiobtn:active { background:#2c3540; }
+    .audiobtn.sm {
+      background:#1e252d; color:#c9a45c; border:1px solid #333c46;
+      gap:9px; padding:9px 18px 9px 11px; font-size:0.88em;
+    }
+    .audiobtn.sm:active { background:#252d36; }
     .hidden { display:none; }
     .distance { font-size:1.6em; color:#c9a45c; margin:30px 0 10px; }
     .distance-note { color:#7d8fa3; font-size:0.85em; }
@@ -128,7 +139,7 @@
   <!-- STORY (voice call) -->
   <div class="screen hidden" id="storyScreen">
     <h2 id="storyTitle"></h2>
-    <button id="playBtn" onclick="playVoice()">&#9654; PLAY MESSAGE</button>
+    <button id="playBtn" class="audiobtn" onclick="playVoice()"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="none" stroke="#c9a45c" stroke-width="1.4"/><path d="M9.5 7.8 L17 12 L9.5 16.2 Z" fill="#c9a45c"/></svg>Play message</button>
     <p class="transcript hidden" id="transcript"></p>
     <button class="hidden" id="afterVoiceBtn" onclick="afterVoice()">CONTINUE</button>
   </div>
@@ -153,7 +164,7 @@
       <div class="ward-state-label" id="wardStateLabel"></div>
       <div id="wardText"></div>
     </div>
-    <button class="hintbtn" id="wardPlayBtn" onclick="playWardVoice()">&#9654; HEAR SAL</button>
+    <button class="audiobtn sm" id="wardPlayBtn" onclick="playWardVoice()"><svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="none" stroke="#c9a45c" stroke-width="1.4"/><path d="M9.5 7.8 L17 12 L9.5 16.2 Z" fill="#c9a45c"/></svg>Hear Sal</button>
     <br>
     <button onclick="afterWard()">CONTINUE</button>
   </div>
@@ -193,7 +204,7 @@
   <div class="screen hidden" id="salScreen">
     <h2 id="salTitle">SAL FARO</h2>
     <p class="story" id="salText"></p>
-    <button class="hintbtn" id="salPlayBtn" onclick="playSalVoice()">&#9654; HEAR SAL</button>
+    <button class="audiobtn sm" id="salPlayBtn" onclick="playSalVoice()"><svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="none" stroke="#c9a45c" stroke-width="1.4"/><path d="M9.5 7.8 L17 12 L9.5 16.2 Z" fill="#c9a45c"/></svg>Hear Sal</button>
     <br>
     <button id="salContinueBtn" onclick="salContinue()">CONTINUE</button>
   </div>
@@ -781,4 +792,5 @@
   </script>
 </body>
 </html>
+
 
