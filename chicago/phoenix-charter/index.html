@@ -153,6 +153,8 @@
       <div class="ward-state-label" id="wardStateLabel"></div>
       <div id="wardText"></div>
     </div>
+    <button class="hintbtn" id="wardPlayBtn" onclick="playWardVoice()">&#9654; HEAR SAL</button>
+    <br>
     <button onclick="afterWard()">CONTINUE</button>
   </div>
 
@@ -552,9 +554,15 @@
       var lbl = document.getElementById('wardStateLabel');
       if (lbl) { lbl.textContent = label; }
       document.getElementById('wardText').textContent = b.ward.text;
+      document.getElementById('wardPlayBtn').classList.remove('hidden');
       showScreen('wardScreen');
-      // Sal is still on the line from the call moments ago — his reaction just continues.
-      // No incoming-call framing; the voice auto-plays and the transcript stays on screen.
+    }
+
+    // Sal is still on the line from the call — tapping plays his ward reaction.
+    // (iOS Safari blocks auto-play of speech; a tap is required to unlock audio.)
+    function playWardVoice() {
+      var b = BEATS[current];
+      document.getElementById('wardPlayBtn').classList.add('hidden');
       speak(b.ward.text);
     }
 
@@ -685,4 +693,5 @@
   </script>
 </body>
 </html>
+
 
