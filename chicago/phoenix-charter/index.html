@@ -50,6 +50,7 @@
     .hintbtn { background:#2e3742; color:#c9a45c; font-size:0.9em; padding:12px 20px; }
     .hinttext { color:#c9a45c; font-style:italic; margin-top:16px; line-height:1.6; }
     .puzzle-prompt { white-space:pre-wrap; font-style:italic; }
+    .pieces-indicator { color:#c9a45c; font-size:0.8em; letter-spacing:2px; margin-top:26px; opacity:0.8; }
     /* --- Ember ambiance --- */
     .ember {
       position: fixed; bottom: -10px; width: 5px; height: 5px; border-radius: 50%;
@@ -63,24 +64,55 @@
       55%  { opacity: 0.35; }
       100% { transform: translateY(-105vh) translateX(14px) scale(0.4); opacity: 0; }
     }
-    /* --- Ward reveal card --- */
+    /* --- Ward reveal cards --- */
     .ward {
       border-radius: 12px; padding: 22px 20px; margin: 26px auto; max-width: 320px;
       line-height: 1.7; text-align: left;
     }
-    .ward-intact { border:1px solid #6b8f6b; background:#182018; color:#bcd6bc; }
-    .ward-relit  { border:1px solid #c9a45c; background:#241f14; color:#e6cf9a; }
-    .ward-absent { border:1px solid #7a4a4a; background:#201414; color:#d6b0b0; }
+    .ward-intact    { border:1px solid #6b8f6b; background:#182018; color:#bcd6bc; }
+    .ward-relit     { border:1px solid #c9a45c; background:#241f14; color:#e6cf9a; }
+    .ward-destroyed { border:1px solid #7a4a4a; background:#201414; color:#d6b0b0; }
     .ward-symbol { text-align:center; margin-bottom:10px; }
     .ward-symbol svg { width:56px; height:56px; }
-    .ward-state-label { text-align:center; font-size:0.75em; letter-spacing:3px; text-transform:uppercase; margin-bottom:12px; opacity:0.85; }
-    .placeholder {
-      border: 2px dashed #c9a45c; border-radius: 12px; padding: 40px 20px; margin: 26px auto; max-width: 300px;
-      color: #c9a45c; letter-spacing: 2px; font-size: 1.05em;
+    .ward-relit .ward-symbol svg { animation: flare 2.6s ease-out 1; }
+    @keyframes flare {
+      0%   { filter: drop-shadow(0 0 2px rgba(201,164,92,0.2)); }
+      30%  { filter: drop-shadow(0 0 14px rgba(255,200,110,0.95)); }
+      100% { filter: drop-shadow(0 0 0 rgba(201,164,92,0)); }
     }
-    .revealCaption { color:#7d8fa3; font-style:italic; line-height:1.7; text-align:left; }
+    .ward-state-label { text-align:center; font-size:0.75em; letter-spacing:3px; text-transform:uppercase; margin-bottom:12px; opacity:0.85; }
+    /* --- Piece reveal --- */
+    .piece-card {
+      border: 1px solid #4a4234; background: #1c1a15; border-radius: 12px;
+      padding: 28px 20px; margin: 26px auto; max-width: 320px;
+    }
+    .piece-glyph svg { width: 64px; height: 84px; }
+    .piece-caption { color:#b9ab8a; font-style:italic; line-height:1.7; text-align:left; margin-top:14px; font-size:0.98em; }
+    /* --- The letter (Beat 13) --- */
+    .envelope {
+      display:block; width: 100%; max-width: 320px; margin: 30px auto 0; box-sizing: border-box;
+      background: #e9dfc8; color: #2a2419; border: 1px solid #b8a878;
+      border-radius: 6px; padding: 26px 20px; font-family: Georgia, serif;
+      letter-spacing: 2px; box-shadow: 0 4px 18px rgba(0,0,0,0.5);
+    }
+    .envelope:active { background:#ded3b8; }
+    .envelope .env-sub { display:block; font-size:0.72em; letter-spacing:3px; color:#7a6c48; margin-top:8px; text-transform:uppercase; }
+    .letter-paper {
+      background: #efe6d2; color: #2a2419; border: 1px solid #b8a878; border-radius: 6px;
+      padding: 24px 22px; margin: 22px auto; max-width: 380px; text-align: left;
+      line-height: 1.75; font-style: italic; font-size: 1.0em;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.5); white-space: pre-wrap;
+    }
+    /* --- The name & the burn (Beat 19) --- */
+    .name-row { display:flex; justify-content:center; gap:10px; margin: 34px 0 10px; }
+    .name-row svg { width: 52px; height: 70px; transition: filter 3s ease, opacity 3s ease; }
+    .name-caption { color:#7d8fa3; font-size:0.85em; letter-spacing:2px; text-transform:uppercase; }
+    .charred svg { filter: brightness(0.12) blur(0.6px); opacity: 0.35; }
+    .burnbtn { background:#8a3b2a; color:#f2d9c9; font-size:1.15em; letter-spacing:3px; padding:18px 44px; }
+    .burnbtn:active { background:#6e2f21; }
     .doorbtn { display:block; width:100%; box-sizing:border-box; margin-top:14px; }
     .door-secondary { background:#2e3742; color:#c9a45c; }
+    .smalllink { background:none; border:none; color:#7d8fa3; text-decoration:underline; font-size:0.85em; padding:8px; margin-top:14px; }
   </style>
 </head>
 <body>
@@ -97,9 +129,8 @@
   <div class="screen" id="cover">
     <h1>THE PHOENIX CHARTER</h1>
     <p class="meta">
-      Chapter 1: The Ward<br>
-      Starts at the Cultural Center, the Loop<br>
-      ~90 minutes &middot; pause anytime<br>
+      The Chicago Loop &middot; begins and ends at City Hall<br>
+      Two chapters &middot; 19 stops &middot; pause anytime<br>
       Best for groups of 2&ndash;5 &middot; a walking mystery
     </p>
     <p class="story">
@@ -113,7 +144,7 @@
     <button id="beginBtn" onclick="startHunt()">BEGIN</button>
   </div>
 
-  <!-- WALKING / ARRIVAL -->
+  <!-- WALKING / GPS -->
   <div class="screen hidden" id="walking">
     <h2 id="walkTitle"></h2>
     <p class="story" id="walkDirections"></p>
@@ -124,6 +155,7 @@
     <br>
     <button class="hintbtn" id="mapBtn" onclick="openMap()">SHOW ME ON THE MAP</button>
     <button class="devbtn hidden" id="devArrive" onclick="arrive()">[dev] simulate arrival</button>
+    <div class="pieces-indicator hidden" id="piecesIndicator"></div>
   </div>
 
   <!-- ARRIVAL NOTE (tour-guide facts) -->
@@ -133,15 +165,15 @@
       <div class="arrival-label">Where you're standing</div>
       <div id="arrivalText"></div>
     </div>
-    <button onclick="showStoryScreen()">CONTINUE</button>
+    <button onclick="showCallScreen()">CONTINUE</button>
   </div>
 
-  <!-- STORY (voice call) -->
-  <div class="screen hidden" id="storyScreen">
-    <h2 id="storyTitle"></h2>
-    <button id="playBtn" class="audiobtn" onclick="playVoice()"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="none" stroke="#c9a45c" stroke-width="1.4"/><path d="M9.5 7.8 L17 12 L9.5 16.2 Z" fill="#c9a45c"/></svg>Play message</button>
+  <!-- INCOMING CALL (Sal's arrival call) -->
+  <div class="screen hidden" id="callScreen">
+    <h2>SAL FARO &mdash; INCOMING CALL</h2>
+    <button id="playBtn" class="audiobtn" onclick="playCall()"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="none" stroke="#c9a45c" stroke-width="1.4"/><path d="M9.5 7.8 L17 12 L9.5 16.2 Z" fill="#c9a45c"/></svg>Answer the call</button>
     <p class="transcript hidden" id="transcript"></p>
-    <button class="hidden" id="afterVoiceBtn" onclick="afterVoice()">CONTINUE</button>
+    <button class="hidden" id="afterVoiceBtn" onclick="afterCall()">CONTINUE</button>
   </div>
 
   <!-- PUZZLE -->
@@ -155,6 +187,17 @@
     <br>
     <button class="hintbtn" onclick="nextHint()">NEED A HINT?</button>
     <p class="hinttext hidden" id="hintText"></p>
+    <br>
+    <button class="smalllink hidden" id="rereadLetterBtn" onclick="showLetter(true)">Read the stranger's letter again</button>
+  </div>
+
+  <!-- REUSABLE SAL MESSAGE (followups, no-show, break clips, welcome-back) -->
+  <div class="screen hidden" id="salScreen">
+    <h2 id="salTitle">SAL FARO</h2>
+    <p class="story" id="salText"></p>
+    <button class="audiobtn sm" id="salPlayBtn" onclick="playSalVoice()"><svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="none" stroke="#c9a45c" stroke-width="1.4"/><path d="M9.5 7.8 L17 12 L9.5 16.2 Z" fill="#c9a45c"/></svg>Hear Sal</button>
+    <br>
+    <button id="salContinueBtn" onclick="salContinue()">CONTINUE</button>
   </div>
 
   <!-- WARD REVEAL -->
@@ -164,17 +207,34 @@
       <div class="ward-state-label" id="wardStateLabel"></div>
       <div id="wardText"></div>
     </div>
-    <button class="audiobtn sm" id="wardPlayBtn" onclick="playWardVoice()"><svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="none" stroke="#c9a45c" stroke-width="1.4"/><path d="M9.5 7.8 L17 12 L9.5 16.2 Z" fill="#c9a45c"/></svg>Hear Sal</button>
-    <br>
-    <button onclick="afterWard()">CONTINUE</button>
+    <button onclick="nextStep()">CONTINUE</button>
   </div>
 
-  <!-- COMPONENT / REVEAL -->
-  <div class="screen hidden" id="revealScreen">
-    <h2 id="revealTitle"></h2>
-    <div class="placeholder" id="revealImage"></div>
-    <p class="revealCaption" id="revealCaption"></p>
-    <button onclick="afterReveal()">CONTINUE</button>
+  <!-- PIECE OF THE RITE -->
+  <div class="screen hidden" id="pieceScreen">
+    <h2 id="pieceTitle"></h2>
+    <div class="piece-card">
+      <div class="piece-glyph" id="pieceGlyph"></div>
+      <div class="piece-caption" id="pieceCaption"></div>
+    </div>
+    <button onclick="nextStep()">CONTINUE</button>
+  </div>
+
+  <!-- THE LETTER: ENVELOPE CARD (Beat 13) -->
+  <div class="screen hidden" id="letterCardScreen">
+    <h2>SOMETHING IN THE MAIL</h2>
+    <button class="envelope" onclick="openTheLetter()">
+      READ THE LETTER
+      <span class="env-sub">no return address</span>
+    </button>
+  </div>
+
+  <!-- THE LETTER: THE PAPER ITSELF -->
+  <div class="screen hidden" id="letterScreen">
+    <h2>THE STRANGER'S LETTER</h2>
+    <div class="letter-paper" id="letterBody"></div>
+    <button id="letterContinueBtn" onclick="afterLetter()">CONTINUE</button>
+    <button class="hidden door-secondary" id="letterBackBtn" onclick="backToPuzzle()">BACK TO THE RIDDLE</button>
   </div>
 
   <!-- DIRECTION CARD -->
@@ -184,236 +244,596 @@
     <button onclick="nextBeat()">WALK ON</button>
   </div>
 
-  <!-- END OF BUILT TRAIL -->
-  <div class="screen hidden" id="endScreen">
-    <h2>END OF THE BUILT TRAIL</h2>
-    <p class="story">This is where Chapter 1 currently ends. Chapter 2 &mdash; the
-      canyon and the Rookery &mdash; is coming soon. Well walked, Draughtsman.</p>
-  </div>
-
   <!-- CHAPTER END (three doors) -->
   <div class="screen hidden" id="chapterEnd">
     <h2 id="chapterEndHeading">CHAPTER ONE COMPLETE</h2>
     <p class="story" id="chapterEndText"></p>
     <button class="doorbtn" id="doorContinue" onclick="continueChapter()">CARRY ON</button>
     <button class="doorbtn door-secondary" id="doorPause" onclick="pauseForToday()">PAUSE &mdash; COME BACK LATER</button>
-    <button class="doorbtn door-secondary" id="doorTorch" onclick="passTheTorch()">PASS THE TORCH (END THE GAME)</button>
+    <button class="doorbtn door-secondary" id="doorTorch" onclick="passTheTorch()">PASS THE TORCH (END YOUR WALK)</button>
   </div>
 
-  <!-- REUSABLE SAL MESSAGE (induction, farewells, welcome-back) -->
-  <div class="screen hidden" id="salScreen">
-    <h2 id="salTitle">SAL FARO</h2>
-    <p class="story" id="salText"></p>
-    <button class="audiobtn sm" id="salPlayBtn" onclick="playSalVoice()"><svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="none" stroke="#c9a45c" stroke-width="1.4"/><path d="M9.5 7.8 L17 12 L9.5 16.2 Z" fill="#c9a45c"/></svg>Hear Sal</button>
+  <!-- THE NAME & THE BURN (Beat 19) -->
+  <div class="screen hidden" id="nameScreen">
+    <h2>THE NAME, MADE WHOLE</h2>
+    <div class="name-row" id="nameRow"></div>
+    <p class="name-caption">five pieces &middot; one name &middot; unspoken since 1871</p>
+    <button class="audiobtn" id="preburnBtn" onclick="playPreburn()"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="none" stroke="#c9a45c" stroke-width="1.4"/><path d="M9.5 7.8 L17 12 L9.5 16.2 Z" fill="#c9a45c"/></svg>Answer the call</button>
+    <p class="transcript hidden" id="preburnTranscript"></p>
     <br>
-    <button id="salContinueBtn" onclick="salContinue()">CONTINUE</button>
+    <button class="burnbtn hidden" id="burnBtn" onclick="burnIt()">BURN IT</button>
+    <button class="hidden" id="finishBtn" onclick="finishHunt()">IT IS DONE</button>
+  </div>
+
+  <!-- END SCREEN -->
+  <div class="screen hidden" id="endScreen">
+    <h2>WELL WALKED, DRAUGHTSMAN</h2>
+    <p class="story">
+      The door is shut. Five pieces of a name nobody had spoken since 1871, found and
+      burned on the ground where it all began. Two wards relit. A grandfather's work,
+      finished.<br><br>
+      "The order keeps what the world forgets." So the order keeps you now &mdash; your
+      name, in the book, next to his. Where it belongs.<br><br>
+      Walk seen&hellip; and go unseen.
+    </p>
+    <button class="door-secondary" onclick="replayHunt()">START A NEW TRAIL</button>
   </div>
 
   <script>
     /* ==================================================================
-       THE PHOENIX CHARTER — Chapter 1: "The Ward" (7 beats)
-       Supernatural canon. Governed by the story bible.
-       All GPS coords are PROVISIONAL (map-derived). [VERIFY ON-SITE]
-       puzzles use placeholder-but-playable answers where noted.
+       THE PHOENIX CHARTER — FINAL BUILD (v2, from scratch, Aug 2026)
+       19 beats · clockwise Loop · City Hall opens AND closes the hunt.
+
+       Sources of record:
+         - phoenix-charter-master-audio-script.md   (all 45 voice clips)
+         - phoenix-charter-onscreen-text.md         (cards, notes, riddles, hints)
+         - phoenix-charter-locations-master.md      (walk order, coords, radii)
+
+       All GPS coords are PROVISIONAL (map-derived) — overwrite after the
+       scouting walk. [walking directions TBD] placeholders likewise.
 
        Each beat can have:
+         id           audio filename prefix, e.g. 'ch1-b01'
          title, directions, gps{lat,lon,radius}
-         arrivalNote  (tour-guide facts screen, before the voice call)
-         voiceTitle, voice
-         puzzle{prompt, answers[], hints[]}   (optional)
-         ward{state:'intact'|'relit'|'absent', text}  (optional)
-         reveal{title, image, caption}  (optional — rite component)
-         card  (direction to next beat)
-         induction (optional script string shown with reveal — Beat 7)
-         chapterEnd{...}  (optional — three-door break)
+         arrivalNote  (or arrivalWeekday/arrivalWeekend on Beat 1)
+         call, followup                 (voice transcripts, tags stripped —
+                                         shown on screen + robot-voice fallback)
+         puzzle{prompt, answers[], hints[3]}   (hint tier 3 gives the answer)
+         steps[]      what happens after the followup, in order. Any of:
+                      'ward' 'piece' 'letter' 'noshow' 'break'
+         ward{state:'intact'|'relit'|'destroyed', text}
+         piece        1–5 (which piece of the rite is recovered here)
+         finale       true on Beat 19 (name assembly + burn, no followup)
        ================================================================== */
+
+    /* ---------- the stranger's letter (Beat 13; re-shown at Beat 18) ---------- */
+    var LETTER_TEXT = "Dear Salvatore, I served the order for years, alongside your grandfather. I was there when the others began to go missing. one at a time, no bodies, no goodbyes. And to my great shame I abandoned my oath.. I ran. There were so few of us left then. I'd found a piece of that rite your grandfather was searching for and arranged to meet him. But he never showed. I think IT took him before I could get it to him. After that, I just lost hope. But I've kept tabs on you. And I've seen you pick up the torch your grandfather carried. He never gave up hope, and so I must do what I can to help. to make amends, before... Well, in any case I will try and reach you, but If this letter reaches you instead of my own voice, then IT has found me before I could. Know this. The piece is safe where I hid it, and only one of the order will understand.\n\nSome call me a beast, some swear I'm a bride,\nOthers see nothing, just shadows and pride.\nI'm neither a hero nor king on a throne,\nYet millions have met me and leave me alone.\nNo plaque tells my story, no name carved in stone\u2014\nOnly whispers: \"He sent it from Spain to our home.\"\nWho am I?";
+
+    var STRANGERS_RIDDLE = "Some call me a beast, some swear I'm a bride,\nOthers see nothing, just shadows and pride.\nI'm neither a hero nor king on a throne,\nYet millions have met me and leave me alone.\nNo plaque tells my story, no name carved in stone\u2014\nOnly whispers: \"He sent it from Spain to our home.\"\nWho am I?";
+
     var BEATS = [
-      /* ---------- BEAT 1 ---------- */
+
+      /* ---------------- BEAT 1 — CITY HALL (opening) ---------------- */
       {
-        title: "THE FIRST STONE",
-        directions: "Head to the Chicago Cultural Center, 78 E. Washington Street. Stand at the Washington Street steps.",
-        gps: { lat: 41.8837, lon: -87.6249, radius: 50 },
-        arrivalNote: "The Chicago Cultural Center \u2014 Chicagoans once called it the \"People's Palace.\" It opened in 1897 as the city's first public library, and its very first books were a gift: after the Great Fire, England shipped thousands of volumes to a city most of them would never see. The books waited years in a repurposed iron water tank before this palace was built to hold them. If the doors are open, step inside and look up \u2014 the ceiling is the largest Tiffany stained-glass dome in the world.",
-        voiceTitle: "INCOMING CALL \u2014 UNKNOWN NUMBER",
-        voice: "You answered. Thank God. I didn't want to pull you into this \u2014 I want you to know that. But it's getting closer, and I'm running out of time. Before you agree to anything, you need to know what you're stepping into. Look around you. In 1871, this entire city burned to the ground. Almost nobody knows why it really happened. My grandfather knew. I found his journal a few years back, and I've been following his trail ever since, trying to find out what happened to him \u2014 because one day he walked out to finish it, and never came home. I'm getting too old to walk this alone. Will you help me? One more thing. You need to look for a mark. The journal warns us to 'follow the mark and keep to the trail.' It looks like the letter 'Y' set in a circle. I'm still investigating, but I think it's important.",
-        puzzle: null,
-        card: "Sal's grandfather started his trail the same place the city started over \u2014 the old shopping street. Walk west on Washington Street, away from the lake, to State Street. On the corner: a great department-store palace, and a green clock the size of a wagon wheel hanging over the sidewalk. Stand beneath it."
-      },
-      /* ---------- BEAT 2 ---------- */
-      {
-        title: "THE TIMEKEEPER",
-        directions: "Walk west on Washington Street to State Street. Find the great green clock hanging over the sidewalk at the corner of the old department store.",
-        gps: { lat: 41.8830, lon: -87.6277, radius: 50 },
-        arrivalNote: "Marshall Field's \u2014 now Macy's \u2014 the store that taught the world how to shop. This corner was Chicago's meeting spot even before the clock: shoppers used to leave notes wedged in the window corners telling friends when to meet. So in 1897 Field hung a clock to end the confusion, and 'meet me under the clock' became a Chicago saying. Look up \u2014 it's nearly eight tons of cast bronze, and its hands are made of wood.",
-        voiceTitle: "SAL FARO",
-        voice: "Good. You found it \u2014 the Draughtsmen's meeting place. I'll tell you more about them soon; for now, just know they chose this corner because it was public, and public meant safe. There were more eyes here than anywhere in the city. But before the journal lets you move on, my grandfather set a condition. He wrote it right here: prove that you can see what most are blind to.",
-        puzzle: {
-          prompt: "'My face tells no lie, though I wear more than one.\nThe stranger meets a friend at me and thinks his errand done.\nWalk the palace corner to corner, prove you looked at all \u2014\nhow many of me keep the time along this great street's wall?'",
-          answers: ["2", "TWO"],
-          hints: [
-            "The speaker hangs over your head \u2014 and 'more than one' is the whole trick. Walk and count.",
-            "One corner isn't the whole store. Go north to Randolph; that corner keeps time too.",
-            "Two. 'Meet me under the other clock,' they'd say \u2014 and only the order knew which."
-          ]
-        },
-        ward: {
-          state: "intact",
-          text: "There, you see it? Worked right into the ironwork. And I've spotted this one in the journal. It calls the mark a 'ward,' and says this one is intact. But I can't tell what it's meant to ward off \u2014 so much of the journal is written in some damn secret code. I'll keep trying to break it."
-        },
-        card: "Stand under that second clock, at State and Randolph \u2014 the Draughtsmen's secret meeting place \u2014 and look at the corner diagonally across from you. Something's wrong with it; Grandfather circled it in the journal. Cross carefully at the crosswalks and stand on it, the northeast corner, with your back to the tower that's there now."
-      },
-      /* ---------- BEAT 3 ---------- */
-      {
-        title: "THE BROKEN WARD",
-        directions: "Cross to the northeast corner of Randolph and State. Stand with your back to the tower on that corner.",
-        gps: { lat: 41.8847, lon: -87.6274, radius: 50 },
-        arrivalNote: "You're standing where the tallest building in Chicago once stood. The Masonic Temple, 1892 \u2014 twenty-two stories, and for years one of the tallest buildings on Earth. Shops filled its base, offices its middle, and the Masons' own meeting halls crowned the very top. In 1939 it was torn down for the State Street subway. Look around: no plaque, no trace. The tallest thing in the city, gone as if it were never here.",
-        voiceTitle: "SAL FARO",
-        voice: "This is the corner. Feel that? Like something's missing? My grandfather wrote there was a ward here once \u2014 one of the strongest, he said, set in the crown of a great tower. Then the city pulled the tower down to make room for a subway and never knew what they were tearing out. The journal has a word for a place like this, but it's in the code I can't crack yet. All I know is what he underlined, twice: where the ward is gone, do not linger. So let's do this quick. Find what's still standing tall on this street \u2014 and count.",
-        puzzle: {
-          prompt: "'I spell one word the whole world knows, upright against the sky.\nBy night I burn, by day I bleach, and never once say why.\nThe order counted me each dusk to prove the dark still kept its bound \u2014\ncount my letters, speak the number, and you hold this hollow ground.'",
-          answers: ["7", "SEVEN"],
-          hints: [
-            "Look north up State Street \u2014 the riddle stands on end in lights, the one word the whole world knows.",
-            "Count the letters. C-H-I-C-A...",
-            "Seven. Hold the ground the ward can't."
-          ]
-        },
-        ward: {
-          state: "absent",
-          text: "Good, you solved it. But there's no mark to find here. I did just find another note in the journal though. He wrote one line under this stop and pressed the pen so hard it tore the page: where it broke, it feeds. I don't know what 'it' is yet. But I don't like standing here. You've found the corner. That's enough. Let's move."
-        },
-        card: "Look north, toward that sign you just counted. The great white theater with the arch like a gate \u2014 that's where the next mark hides, and it's the most famous one in the whole city. Cross to the far sidewalk so you can take in its whole face at once. Walk on \u2014 I'll feel better when we're moving."
-      },
-      /* ---------- BEAT 4 ---------- */
-      {
-        title: "HIDDEN IN PLAIN SIGHT",
-        directions: "Stand on the west sidewalk of State Street, across from the Chicago Theatre, where you can see its whole face at once.",
-        gps: { lat: 41.8852, lon: -87.6276, radius: 50 },
-        arrivalNote: "The Chicago Theatre, 1921 \u2014 billed as 'the Wonder Theatre of the World,' the first grand movie palace in America and the model for every one that followed. That facade is a miniature Arc de Triomphe, and the six-story CHICAGO sign is one of the last original exposed-lamp electric signs still lit in the country. You just counted its letters from the last corner. Now look closer at the marquee \u2014 there's more hiding in it than a name.",
-        voiceTitle: "SAL FARO",
-        voice: "This is the one. Feel how it's easier to breathe here? Grandfather wrote that this stretch of the trail is the safest in the Loop, because the biggest ward in the city is hanging right there in plain sight \u2014 and it's intact. Look at that sign. A million people a year photograph it and not one of them sees what's tucked into it. That's the whole trick of the mark: hidden in plain sight. He wrote that finding this one is how a new member of his order proved they were worthy. So prove it. It's up there, in the lights.",
-        puzzle: {
-          prompt: "'A letter in no alphabet, a river in no sea,\nthree arms inside a ring of light where all the world can see.\nA million glances wash across and never once take hold \u2014\nfind where the mark lives and name the thing it's on.'",
-          answers: ["MARQUEE", "THE MARQUEE", "ON THE MARQUEE", "SIGN", "THE SIGN", "IN THE SIGN", "ON THE SIGN", "THE CHICAGO SIGN", "MARQUEE SIGN"],
-          hints: [
-            "A Y held inside a circle. It's hiding in something on that building.",
-            "Stop reading the sign \u2014 you're missing the forest for the trees.",
-            "There \u2014 the Y in its ring, is on the 'marquee,' or 'sign' if you prefer."
-          ]
-        },
-        ward: {
-          state: "intact",
-          text: "There it is. The strongest ward still standing in the Loop, and you found it in the middle of all that light. Grandfather drew this one in the journal three times, pressed hard \u2014 it mattered to him most. It's intact. Whatever it's holding back, it's holding. That's the good news. I'll tell you the bad news when the journal lets me. For now \u2014 this is the safest you'll feel all day. Enjoy it a second before we go."
-        },
-        card: "Now the journal turns dark again. Grandfather's next note is short: the alley behind the theaters. Speak softly there. Go west a block to Dearborn, turn toward the river, and find the narrow brick alley called Couch Place. Stop at its mouth. Lower your voice before you step in \u2014 you'll understand when I do. And keep your eyes down; this isn't a place to hunt for the mark."
-      },
-      /* ---------- BEAT 5 ---------- */
-      {
-        title: "THE NIGHT IT GOT LOOSE",
-        directions: "Find Couch Place \u2014 the narrow brick alley behind the Nederlander Theatre, running between State and Dearborn just off Randolph. Stop at its mouth. Speak softly here, stay on the path, and touch nothing.",
-        gps: { lat: 41.8851, lon: -87.6287, radius: 40 },
-        arrivalNote: "This alley runs behind what was the Iroquois Theatre. On December 30, 1903 \u2014 five weeks after it opened, advertised as 'absolutely fireproof' \u2014 a matinee filled with families caught fire. More than 600 people died, most of them women and children; it remains the deadliest single-building fire in American history. Many were trapped by doors that opened inward and exits locked from outside. Every law that followed \u2014 doors that open outward, the panic bar on every public door, lighted exit signs, occupancy limits \u2014 was written because of what happened here. Stand quietly a moment before you go on.",
-        voiceTitle: "SAL FARO",
-        voice: "I need you to just... give me a minute. I've spent all morning on the page for this stop, and I finally broke the cipher. I wish I hadn't. You asked me what the wards hold back. Here it is. In 1871, the fire that burned this whole city \u2014 it wasn't a lantern, wasn't a cow. That was a story someone fed the papers to bury the truth. The truth is a handful of spiritualists tried to open a door that should've stayed shut, and something came through. My grandfather's order, the Draughtsmen, had a name for it. They called it the Traveller. For thirty years they hunted it, and in 1903 they finally cornered it \u2014 right here. They'd attempted a ritual to force it back through the door it came from. Something went wrong. Six hundred people. The order was trying to save this city and instead they... But listen \u2014 Grandfather's note says this one, the ward that failed that night, was never rebuilt. The ground's been open ever since, allowing the Traveller free passage. Let's close it.",
-        puzzle: {
-          prompt: "Grandfather didn't leave a riddle for this stop. He left a single question, and the answer the whole world learned that night:\n\n'After the fire here, the law changed one thing about every public door on earth \u2014 the thing that saves you when you run. Which way must a door open?'",
-          answers: ["OUT", "OUTWARD", "OUTWARDS", "OUT NOT IN", "AWAY", "AWAY FROM YOU", "PUSH", "OUTWARD ONLY"],
-          hints: [
-            "Think about what killed so many that day \u2014 doors that opened the wrong way, and wouldn't.",
-            "The bar you push in an emergency. It only goes one direction.",
-            "Outward. Every door that opens out, everywhere, is this alley's memorial."
-          ]
-        },
-        ward: {
-          state: "relit",
-          text: "You\u2014 hang on. The mark. On the page. It just\u2014 it lit up. Right there in the journal, the ink caught like a struck match and then... settled. Back to plain pen. I felt it go warm under my thumb. I don't know how to tell you what you just did. That ward's been dark for a hundred and twenty years. This ground has been open to that thing since the day it got loose \u2014 and you just closed it. Grandfather spent his whole life trying to do what you just did. Thank you. Truly. Now \u2014 let's not linger."
-        },
-        card: "Come back into the light \u2014 walk west, out toward the open plaza where the streets widen. You need something easier after that, and so do I. There's a sculpture ahead that's puzzled this city for sixty years, and the ward there is one of the strange ones. Go on. I'll catch my breath."
-      },
-      /* ---------- BEAT 6 ---------- */
-      {
-        title: "THE UNANSWERED",
-        directions: "Walk west to Daley Plaza. Stand before the great rust-colored steel sculpture at its center \u2014 the Chicago Picasso.",
-        gps: { lat: 41.8842, lon: -87.6300, radius: 60 },
-        arrivalNote: "The Chicago Picasso, 1967 \u2014 50 feet of Cor-Ten steel, a gift from an artist who refused the $100,000 the city offered and never once set foot in Chicago. When the veil dropped, the crowd booed; one columnist called it a giant insect. And here's the thing nobody can settle: Picasso never said what it is. A woman? A bird? He later hinted it was his Afghan hound. The city gave up guessing and let the kids climb it instead.",
-        voiceTitle: "SAL FARO",
-        voice: "There. Breathe. After that last stop we both needed something the city can't take too seriously, and this is it \u2014 Chicago's favorite argument, standing here since '67 and still refusing to explain itself. Grandfather liked this one. He wrote that the Draughtsmen trusted a thing that admits it doesn't have all the answers more than a thing that claims it does. There's a ward here too \u2014 but not where you're looking. Everyone stares at the steel; the mark's on the building behind it, the tall tower. He noted it 'quiet, but holding.' Find it up there \u2014 then do the one thing this whole city's failed to do for sixty years: read what the record actually calls this sculpture.",
-        puzzle: {
-          prompt: "'Fifty feet of rust and riddle, and the maker held his tongue.\nA woman, or a wing, or a hound \u2014 the argument's still young.\nThe city carved one honest word where all its guessing ends \u2014\nfind the plate, and read the name the record recommends.'",
-          answers: ["UNTITLED", "NO NAME", "NONE", "IT HAS NO NAME", "THE PICASSO", "PICASSO", "CHICAGO PICASSO"],
-          hints: [
-            "The riddle's answer is the lack of one \u2014 what do you call a work the artist never named?",
-            "Find the dedication plaque, low near the base, and read what the city officially calls it.",
-            "Untitled. Sixty years, and the honest answer is that it has no name."
-          ]
-        },
-        ward: {
-          state: "intact",
-          text: "There's the mark \u2014 up on the tower, tucked where you'd never look, same as always. Grandfather was right: quiet, but holding. Nothing to close here; this one never failed. Funny \u2014 the ward and the sculpture are the same joke, aren't they. Both sitting in the busiest square in the city, keeping a secret in plain sight, and nobody looks twice. Alright. One more stop, and it's the big one. The block where all of this began."
-        },
-        card: "Face west, across the plaza, to the long grey building with the great columns \u2014 City Hall. Walk to its base and stand before the columns. Grandfather's journal has more pages on this one block than anywhere else in the Loop. It's where the Draughtsmen were born... and where the lie that started everything was written. Come on. Let's finish this."
-      },
-      /* ---------- BEAT 7 (FINALE) ---------- */
-      {
-        title: "WHERE THE RECORDS BURNED",
-        directions: "Cross to City Hall \u2014 the long grey building with the great columns, filling the block west of the plaza. Stand on the sidewalk before its columns.",
+        id: 'ch1-b01',
+        title: 'CITY HALL',
+        directions: "Make your way to City Hall \u2014 121 N. LaSalle St. Meet on the sidewalk before the columned LaSalle Street facade. [walking directions per starting point \u2014 TBD]",
         gps: { lat: 41.8838, lon: -87.6321, radius: 60 },
-        arrivalNote: "The City Hall\u2013County Building, completed 1911, stands where Chicago's old courthouse burned in the Great Fire of 1871 \u2014 the same courthouse that held Lincoln's body in state after his assassination in 1865. The courthouse bell tolled the fire alarm that night until the tower collapsed. Look for a bronze tablet inside: the Iroquois Memorial, sculpted by Lorado Taft for the 600 lost in the 1903 theater fire site you visited earlier. It once hung in a memorial hospital, was lost for decades, and was found again in this building's own basement.",
-        voiceTitle: "SAL FARO",
-        voice: "This is the block. Everything started here. The old courthouse stood on this exact ground, and on the night the city burned, its bell rang the alarm until the tower came down. But that's not what my grandfather cared about. The ward here is still intact. The official cause of the Great Fire is a confessed lie \u2014 and the Draughtsmen let it stand, because the truth was so much worse. They gathered on this block, in the ashes, and swore two oaths: keep the true account, and banish the Traveller. That's the night the order was born. And they warded the building that rose here \u2014 but they were grieving by then, so they hung their mark in mourning. Upside down. It's still there. Find it.",
+        /* Day branch (weekday lobby hours: Mon–Fri 8:30–17:00). Text-only. */
+        arrivalWeekday: "City Hall, completed 1911, stands where Chicago's old courthouse burned in the Great Fire of 1871. The same courthouse that held Lincoln's body in state after his assassination in 1865. The courthouse bell tolled the fire alarm that night until the tower collapsed. If it's open, step inside and look up. See if you can spot the city's forgotten civic symbol. It looks like the letter Y set inside a circle. Most Chicagoans don't know about it. But once you know to look for it, you'll start to see it everywhere, on buildings, lamp posts, manhole covers - hiding in plain sight. In addition, city hall is also hiding one of America's first roof top gardens, now closed to the public. Thousands of plants. Out of sight, and soon forgotten, just like the city's symbol.",
+        arrivalWeekend: "City Hall, completed 1911, stands where Chicago's old courthouse burned in the Great Fire of 1871. The same courthouse that held Lincoln's body in state after his assassination in 1865. The courthouse bell tolled the fire alarm that night until the tower collapsed. The building's shut today \u2014 you'll catch your first one on the street. The symbol you're looking for is the city's forgotten civic emblem: the letter Y set inside a circle. Most Chicagoans don't know about it. But once you know to look for it, you'll start to see it everywhere, on buildings, lamp posts, manhole covers - hiding in plain sight. In addition, city hall is also hiding one of America's first roof top gardens, now closed to the public. Thousands of plants. Out of sight, and soon forgotten, just like the city's symbol.",
+        call: "You answered. Thank God. I didn't want to pull you into this, I want you to know that. But I'm running out of time. Before you agree to anything, you need to know what you're stepping into. Look around you. In 1871, this entire city burned to the ground. Almost nobody knows why it really happened. My grandfather knew. I found his journal a few years back. It's written in some damn code, so I haven't been able to make much of it yet. I just know he was working on something. And one day he walked out to finish it, and never came home. I've been following his trail ever since, trying to find out what happened to him. But I'm getting too old to walk this alone. What do you say? Will you help me? You don't have to answer just yet. But if you agree to, there's something else you need to know. You need to look for a mark. It's drawn here over and over in the journal. It looks like the letter Y inside of a circle. The journal says to 'follow the mark and keep to the trail.' I don't know what that means yet, but I think it's important.",
+        followup: "Garden..got it.. Wait. Give me a second. I think.. I think I've figured out how this journal works. Granddad, you crafty old fox.. It's the riddle answers. They're the keys to unlocking this journal. I can't tell you how many hours I've stared at this thing, trying to make sense of it. But it's starting to make sense. His notes mention Couch Place next. Looks like it's a little alley, off Randolph. Head that way.. and be careful. I'll call you back when I know more.",
         puzzle: {
-          prompt: "'No more hunting hidden marks \u2014 you've earned an easy one.\nThis hall of grief wears pillars tall to face the morning sun.\nStand back and read its columned front, the row that holds the stone \u2014\ncount the great columns standing guard, and name them, every one.'",
-          answers: ["13", "THIRTEEN"],
+          prompt: "Where chimneys dream and antennas climb,\nI bloom in a place that touches the sky.\nFew eyes rise high enough to find my gate,\nYet I drink the same rain the sidewalks taste.\nNo forest around me, no soil below,\nStill roots weave stories only sparrows know.\nWhat am I, hiding above the city's proof,\nA whisper of wild on this building's roof?",
+          answers: ['GARDEN', 'ROOF GARDEN', 'ROOFTOP GARDEN'],
           hints: [
-            "Look at the front of the building \u2014 the tall stone pillars holding up its face. Count them.",
-            "An unlucky number, this one. Start at one end and walk your eye to the other \u2014 don't rush.",
-            "Thirteen. That's the number. Last one of the day."
+            "The answer is something alive \u2014 something growing where you'd never expect anything to grow, high above the street where nobody can see it.",
+            "The arrival note mentioned City Hall is hiding something on its roof \u2014 thousands of plants, out of sight and soon forgotten. What do you call a place where plants grow?",
+            "The answer is GARDEN. City Hall's rooftop garden was one of the first on any American city building \u2014 over 20,000 plants growing in secret above the seat of city power."
           ]
         },
-        reveal: {
-          title: "THE FIRST PIECE",
-          image: "RITE COMPONENT 1 \u2014 scorched vellum, an inked sigil, the Mark pressed in the corner",
-          caption: "The first piece of your grandfather's rite \u2014 hidden on the block where the order was born. He scattered the whole working along the wards, every piece but the last. One recovered."
+        steps: []
+      },
+
+      /* ---------------- BEAT 2 — COUCH PLACE ---------------- */
+      /* NO ward here (canon). Respectful-ground protocol: player stays at the mouth. */
+      {
+        id: 'ch1-b02',
+        title: 'COUCH PLACE',
+        directions: "Proceed to Couch Place \u2014 the alley off Randolph Street between State and Dearborn. Stop at the MOUTH of the alley. Do not enter. [walking directions TBD]",
+        gps: { lat: 41.8851, lon: -87.6287, radius: 40 },
+        arrivalNote: "Behind these walls once stood the Iroquois Theatre, advertised when it opened as \"absolutely fireproof.\" About five weeks later, during a packed holiday matinee, it caught fire \u2014 and more than 600 people died, most of them women and children. It remains the deadliest single-building fire in American history. The tragedy rewrote fire-safety law the world over: outward-opening doors, panic bars, lighted exit signs. Stand at the mouth of the alley; go no further.",
+        call: "Okay, you're there, good. Don't go in the alley. People died here, and this ground deserves better than footsteps. The journal's giving me more now that I've got the first key. I'm not sure what happened that night in this alley, but granddad knew. He called it 'the disaster'. Underlined that several times. almost tore the page. Granddad wasn't some historian. He belonged to something he refers to as 'the order.' And that mark, the circle with the Y? The journal has a word for it too. He calls it a 'ward', but I'm not sure what it's for.",
+        followup: "Out\u2026 yes.. that's the key. Interesting.. The journal's showing me these marks aren't random. They're a network, spread across the whole city. And there's one here he's circled in bold, on State Street. He wants us to see that one next. No need to linger here. Lets go.",
+        puzzle: {
+          prompt: "After the fire here, the law changed one thing about every public door on earth \u2014 the small thing that saves you when you have to run. Which way must a public door open?",
+          answers: ['OUT', 'OUTWARD', 'AWAY', 'PUSH'],
+          hints: [
+            "Think about the last time you left a theater, a school, or a store in a hurry. Which way did the door move when you hit it?",
+            "The arrival note says this fire rewrote fire-safety law \u2014 doors, panic bars, exit signs. People died here because the doors opened the wrong way. The law reversed it.",
+            "The answer is OUTWARD. Every public door on earth now opens out \u2014 away from the crowd \u2014 because of what happened in this alley in 1903. Every panic bar you've ever pushed is a memorial to this place."
+          ]
         },
-        induction: "You did it. You walked the whole first stretch and you brought back the first piece \u2014 I wasn't sure anyone could. There's... okay. The journal has words here. For when someone new is brought into the order. Grandfather wrote them out like he hoped he'd get to use them someday, and I guess that someday is me, standing in a doorway on the phone with a stranger who turned out to be the realest friend I've got. So. \u2014 The order keeps what the world forgets. Walk seen, and go unseen. Welcome, Draughtsman. \u2014 That's you now. Whatever happens next \u2014 you're one of us.",
+        steps: []
+      },
+
+      /* ---------------- BEAT 3 — CHICAGO THEATRE ---------------- */
+      /* Audio ON HOLD (marquee Device unverified) — slots built; robot voice covers until then. */
+      {
+        id: 'ch1-b03',
+        title: 'THE CHICAGO THEATRE',
+        directions: "Proceed to the Chicago Theatre \u2014 175 N. State St. Meet on the WEST sidewalk of State Street, where the whole facade and vertical sign are in view. [walking directions TBD]",
+        gps: { lat: 41.8852, lon: -87.6276, radius: 30 },
+        arrivalNote: "Opened in 1921 as \"the Wonder Theatre of the World,\" this was the first grand movie palace in America \u2014 its facade a miniature Arc de Triomphe. That six-story vertical sign is one of the last original exposed-lamp electric signs still lit in the country. Take a closer look at the marquee. Do you see something familiar?",
+        call: "This is a big one. Granddad calls it the strongest ward still standing in the whole city. And now the journal finally tells me what that means. The marks aren't just decoration. They were made on purpose by his order to hold something back. Hidden in plain sight, a thing everybody walks past and nobody sees. But here's the thing. He says the wards are failing. One by one. Wait... here we go. Another location, another riddle. He writes that this riddle is a special one. The order used this one to test new members. He writes you can prove you belong by seeing what remains hidden to most people. So, go find it! Show me you can spot the details that others miss.",
+        followup: "Paris! Always wanted to see it. Maybe I will, when all this is behind us. You just proved you can read the city the way the order did. That makes you one of the few people alive who can walk it safely. The book's a map of these marks, and it's just pointed us to the next one, the Dusable bridge. Better get going.",
+        puzzle: {
+          prompt: "I'm a circle of chaos where engines all hum,\nTwelve iron rivers to my doorstep come.\nBeneath my stone arch, unknown soldiers sleep,\nWhere victory is silent and memories run deep.\nIn which famed city do my proud shadows roam,\nWhere I stand like a gateway of triumph and stone?",
+          answers: ['PARIS'],
+          hints: [
+            "The riddle describes a famous monument \u2014 a great stone arch standing in a circle of traffic, with a soldier's tomb beneath it. The answer is the city where that arch stands.",
+            "The arrival note said this theatre's facade is a miniature copy of that very arch \u2014 the Arc de Triomphe. What city is the real one in?",
+            "The answer is PARIS. The Chicago Theatre's facade copies the Arc de Triomphe, and twelve avenues really do meet at the real one \u2014 a circle of chaos where the Tomb of the Unknown Soldier lies beneath the arch."
+          ]
+        },
+        ward: { state: 'intact', text: "The strongest ward still standing in the whole city. Marked in the journal \u2014 and holding." },
+        steps: ['ward']
+      },
+
+      /* ---------------- BEAT 4 — DuSABLE BRIDGE ---------------- */
+      /* Voice-only water canon. No ward screen (Device unconfirmed). */
+      {
+        id: 'ch1-b04',
+        title: 'THE DuSABLE BRIDGE',
+        directions: "Proceed to the DuSable Bridge \u2014 Michigan Avenue at the Chicago River. Meet on the bridge deck where the bridgehouse relief sculptures are visible. [walking directions TBD]",
+        gps: { lat: 41.8887, lon: -87.6247, radius: 45 },
+        arrivalNote: "This is the birthplace of the city. The site of Fort Dearborn, and before it the trading settlement of Jean Baptiste Point DuSable, Chicago's first non-Indigenous resident, a founder the histories nearly erased. The four bronze reliefs on the bridgehouses are named Discoverers, Pioneers, Defense, and Regeneration. And in 1900, engineers did something almost unbelievable: they permanently reversed the flow of the Chicago River below us, making the water run away from the lake instead of into it.",
+        call: "Water. That's the secret he's been circling. The journal finally says it plain, the thing the wards hold back, it cannot cross the water. So the order didn't just mark the buildings. They marked the bridges, every crossing. And that insane thing they did in 1900, turning the whole river around? He thinks that was them. turning the river itself into a wall. A moat around the whole city. And he writes, 'solve this riddle and the book opens further.'",
+        followup: "Four. Ok, give me a minute.. I can see now what that unlocks.. Ah! He gives me the name of his order, finally! They called themselves the Draughtsmen. He writes it like it's an oath just to say it. That's what granddad was. And the pages lay out the water rule, the wards follow the water, the crossings are all marked, the river's the moat. This ward still holds, he said. And the next mark's close. Remember, keep to the trail.",
+        puzzle: {
+          prompt: "Four corners keep their silent guard,\nAbove the river's steel backbone.\nEach side tells tales of city and stream,\nOf trading posts, fire, and a skyline grown.\nCount the stories cast in metal\nHistory frozen where waters flow.\nHow many faces watch the crossing,\nGazing down at boats below?",
+          answers: ['4', 'FOUR'],
+          hints: [
+            "This one is a counting puzzle. Look at the towers standing at the corners of the bridge \u2014 each one carries a carved stone scene facing the water.",
+            "The arrival note named them: Discoverers, Pioneers, Defense, and Regeneration \u2014 one relief sculpture per bridgehouse. Count the names.",
+            "The answer is 4. Four bridgehouses, four bronze reliefs \u2014 together they tell the city's origin story in stone, standing guard over the crossing."
+          ]
+        },
+        steps: []
+      },
+
+      /* ---------------- BEAT 5 — MACY'S / STATE STREET ---------------- */
+      /* Three-phase stop, one trigger. NO Macy's ward (old claim was a hallucination).
+         The WARD DESTROYED card = the Masonic Temple's crown ward, fired here. */
+      {
+        id: 'ch1-b05',
+        title: "MACY'S \u2014 STATE STREET",
+        directions: "Proceed to Macy's (the old Marshall Field's) \u2014 State & Washington. Meet under the great green clock on the corner. [walking directions TBD]",
+        gps: { lat: 41.8834, lon: -87.6278, radius: 45 },
+        arrivalNote: "Marshall Field's - now Macy's - the store that taught the world how to shop. This corner was Chicago's meeting spot even before the clock. Shoppers used to leave notes wedged in the window frames. In 1897 the store hung the great bronze clock to end the confusion, and \"meet me under the clock\" became a Chicago saying. It's nearly eight tons of cast bronze \u2014 and its hands are made of wood. Step inside if you can and look up. The ceiling is a six-thousand-square-foot Tiffany glass mosaic, the largest of its kind.",
+        call: "This corner was one of the Draughtsman's meeting place. They picked it because it's public, more eyes here than anywhere in the Loop, and there is safety in numbers. If you can get inside, look straight up. There's a Tiffany ceiling, one of the most beautiful things in the city. It isn't a ward. Some of what the order kept was just\u2026 beauty worth keeping. Granddad says 'The order keeps what the world forgets'. Remember that ceiling, because there's another one like it ahead, and grandfather marked THAT one very differently. But before we can move on, another infernal riddle!",
+        followup: "Two. Ok, another number cipher. lets see.. There's another name mentioned here. 'The Traveller.' Something about an oath the Draughtsmen swore. He won't let me finish either one yet. there's more he's keeping sealed until we've walked further. And look northwest, where that tower stands now. A greater one stood there once. the tallest building in the world in its day. The masonic temple. Granddad says its crown held a powerful ward. But the city tore it down in 1939 to make way for the subway. Planners who had no idea what they were pulling out of the stone. That's the first ward we've found that's just\u2026 gone. Not broken. Removed. And where it broke, he writes, 'it feeds.' I don't like the sound of that. lets get moving again.",
+        puzzle: {
+          prompt: "My face tells no lie, though I wear more than one.\nThe stranger meets a friend at me and thinks his errand done.\nWalk the palace corner to corner, prove you looked at all \u2014\nhow many of me keep the time along this great street's wall?",
+          answers: ['2', 'TWO'],
+          hints: [
+            "The riddle is asking you to count something on the outside of this building \u2014 the thing Chicagoans have met under for more than a century. There may be more than the one in front of you.",
+            "Walk the State Street side of the building, corner to corner. The great green clock you're standing under has a twin.",
+            "The answer is 2. Marshall Field's hung TWO great bronze clocks on State Street \u2014 one at Washington, one at Randolph. Most people only ever notice the one they're standing under."
+          ]
+        },
+        ward: { state: 'destroyed', text: "The Masonic Temple's crown ward \u2014 pulled out of the stone in 1939 by planners who had no idea what they were removing. Not broken. Removed. And where it broke\u2026 it feeds." },
+        steps: ['ward']
+      },
+
+      /* ---------------- BEAT 6 — CHICAGO CULTURAL CENTER ---------------- */
+      /* Call clip ON HOLD (mosaic Y unverified) — slot built; robot voice covers. */
+      {
+        id: 'ch1-b06',
+        title: 'THE CHICAGO CULTURAL CENTER',
+        directions: "Proceed to the Chicago Cultural Center \u2014 78 E. Washington St. Meet on the Washington Street steps. [walking directions TBD]",
+        gps: { lat: 41.8837, lon: -87.6249, radius: 50 },
+        arrivalNote: "The Chicago Cultural Center. Chicagoans once called it the \"People's Palace.\" It opened in 1897 as the city's first public library, and its very first books were a gift. After the Great Fire, England shipped thousands of volumes to a city most of them would never see. The books waited years in a repurposed iron water tank before this palace was built to hold them. The main dome is the largest Tiffany stained glass dome in the world. The building houses a second dome with over 50,000 pieces of glass in the old Grand Army of the Republic rooms. It was hidden behind concrete for decades before being uncovered and restored to daylight. If the doors are open, step inside and look up. There's something up there worth noting.",
+        call: "Remember the ceiling at the store? This is the other one. If you can get inside, look up. same glass, same wonder.. but THIS dome, granddad says is warded. The journal marks it. And its HOLDING. It's intact. Two ceilings, almost twins, and only one of them is a wall. He writes if we can solve the riddle here 'the book's secrets will open up to us'. Something he buried DEEP.",
+        followup: "Two..ok, let me see..Wait... I need a minute. Ok. I've got it now. The fire. 1871. it wasn't a lantern. it wasn't a cow. That was the story they fed the papers to bury the truth. Granddad writes that there were a lot of spiritualists operating in the city back then. some legit. some charlatans. he says a group of them tried to open a door, and something came through. The fire was 'collateral damage'. This palace was raised from the ashes of that wound. And he says the order tried to catch IT once, at couch place. Six hundred people... Granddad thinks he knows why that attempt failed. They were missing a piece of the puzzle. a final 'rite.' That's what the journal is... His search for that last piece. There's more. Words he left for a new member. 'The order keeps what the world forgets. Walk seen, and go unseen. Welcome, Draughtsman.' That's you now.",
+        puzzle: {
+          prompt: "In a city of wind where lake waters gleam,\nA palace of culture fulfills artists' dreams.\nLook to its ceilings, where stories are spun,\nBut count not the tiles, the stars, nor the sun.\nRadiant crowns in the darkness will glow\u2014\nHow many glass domes watch the crowds pass below?",
+          answers: ['2', 'TWO'],
+          hints: [
+            "The riddle asks you to count the crowning glories of this building \u2014 not tiles or windows, but the great glass ceilings themselves.",
+            "The arrival note mentioned both: the largest Tiffany dome in the world, and a second one \u2014 hidden behind concrete for decades before it was rescued.",
+            "The answer is 2. The People's Palace holds two stained-glass domes: the famous Tiffany dome, and a second with over 50,000 pieces of glass that spent decades sealed away behind concrete."
+          ]
+        },
+        ward: { state: 'intact', text: "The second dome \u2014 marked in the journal, and holding. Two ceilings, almost twins. Only one of them is a wall." },
+        steps: ['ward']
+      },
+
+      /* ---------------- BEAT 7 — CHICAGO ATHLETIC ASSOCIATION ---------------- */
+      {
+        id: 'ch1-b07',
+        title: 'THE CHICAGO ATHLETIC ASSOCIATION',
+        directions: "Proceed to the Chicago Athletic Association \u2014 12 S. Michigan Ave, facing Millennium Park. The order met in the 2nd-floor Drawing Room; the beat completes from the street. [walking directions TBD]",
+        gps: { lat: 41.8817, lon: -87.6244, radius: 40 },
+        arrivalNote: "12 South Michigan Avenue \u2014 opened in 1893, just months ahead of the Chicago World's Fair, with three thousand members and a ten-year waiting list. Henry Ives Cobb built its eleven-story facade in Venetian Gothic, using replica pieces modeled on the palace of Venice's rulers across the sea. For over a century this was a members-only world behind those doors. The club rooms survive intact today. If you can, step up to the second floor and explore the Drawing Room.",
+        call: "The journal names this place. Granddad says the order used to meet here in the Drawing Room. An athletic club was perfect cover. Men coming and going at every hour, nobody asking why. That's why he hid it here. The Journal says he left something in this room, for the order. But of course there's a catch.",
+        followup: "I think you've done it. The 'Doge' ruled Venice! Give me a second. He left a letter here. For the order. Let me read it to you. 'By now you will know of the disastrous attempt to snare the Traveller. After many months of study, I believe I finally know why... We were missing a piece of the puzzle, a rite required for the ritual to send IT back. I have scoured creation for pieces of that rite, and have collected all but the final piece. But I can feel it getting closer. So I am scattering what I have gathered, hidden where only one of us, walking the wards, can recover them. And I am recording this journal so that If I should fail, another might finish what I could not.' That's why he hid everything, even from his own family. The journal, the trail, the code.. all of it. He hid the rite across this city to protect it. And he's asking us to finish it. Once and for all. When you are ready, the journal names the next location. Head to the Palmer House.",
+        puzzle: {
+          prompt: "In a city of water, I carried no sword,\nYet armies and merchants obeyed my word.\nNot king, not emperor, I wore a plain crown,\nChosen by many, to rule an island town.\nWho am I, cloaked in state and pageant grand,\nThe quiet commander of sea, trade, and land?",
+          answers: ['DOGE'],
+          hints: [
+            "The riddle describes a ruler \u2014 but not a king or emperor. He was elected, and he ruled a famous city built on water.",
+            "The arrival note said this facade copies the palace of Venice's rulers. Venice gave its elected leader a title no other city used.",
+            "The answer is DOGE. For a thousand years Venice was ruled by an elected Doge from the Doge's Palace \u2014 the very building this facade copies, piece for piece."
+          ]
+        },
+        steps: []
+      },
+
+      /* ---------------- BEAT 8 — PALMER HOUSE ---------------- */
+      {
+        id: 'ch1-b08',
+        title: 'THE PALMER HOUSE',
+        directions: "Proceed to the Palmer House \u2014 State & Monroe. GPS completes at the Monroe entrance; the main lobby (up the stairs) is worth the look. [walking directions TBD]",
+        gps: { lat: 41.8797, lon: -87.6266, radius: 40 },
+        arrivalNote: "The Palmer House, at State and Monroe. The first hotel here opened in 1871 just 13 days before the Great Fire, an unlucky number indeed. Never one to run from a challenge, Potter Palmer rebuilt it and billed it \"The World's Only Fire Proof Hotel.\" Its kitchen invented the chocolate brownie for the 1893 World's Fair, and far below its floors run tunnels that Al Capone's men are said to have used to move liquor through Chicago. Head inside the main lobby and have a look around. Well worth your while.",
+        call: "Good! You made it! Granddad's journal marks this hotel, but not as a ward. As the fire's own ground. The very first hotel here stood thirteen days before the fire took it. This spot was there at the start of everything. And one more thing. A man called me. Says he worked with granddad. Rattled off a few of the places they used to meet for drinks. One of them was the Palmer House, where you're standing now. I don't know what to make of him. Until I know more we stick to the plan. Follow the book, not the stranger. But he said the last time he saw grandfather was in the bar there. Keep that in your back pocket.",
+        followup: "Thirteen! Yes..that's the key. Nice work. The journal points us toward..the fountain of the great lakes, near the Art Institute. One more thing. That man called again. He wants to meet. Face to face. I don't know where or when. I'll let you know.",
+        puzzle: {
+          prompt: "I walk between the dozen's gate,\nthe days before Palmer met its fate,\nSome call me cursed, avoid my name,\nYet math and stars reveal no shame.\nI split a deck, a baker's scheme \u2014\nWhat number haunts the in-between?",
+          answers: ['13', 'THIRTEEN'],
+          hints: [
+            "The answer is a number \u2014 one so unlucky that many tall buildings skip it entirely between the twelfth and fourteenth floors.",
+            "The arrival note told you how many days the first Palmer House stood before the fire took it. A baker's dozen. The cards in one suit.",
+            "The answer is 13. The first Palmer House stood exactly thirteen days before the Great Fire destroyed it \u2014 and thirteen is the baker's dozen, the cards in a suit, and the floor most towers pretend doesn't exist."
+          ]
+        },
+        steps: []
+      },
+
+      /* ---------------- BEAT 9 — FOUNTAIN OF THE GREAT LAKES ---------------- */
+      /* FIRST RELIGHT — lives in the journal; no physical Device required. */
+      {
+        id: 'ch1-b09',
+        title: 'THE FOUNTAIN OF THE GREAT LAKES',
+        directions: "Proceed to the Fountain of the Great Lakes \u2014 the Art Institute's South Garden (South McCormick Court), off Michigan Ave between Adams and Jackson. No museum ticket needed. [walking directions TBD]",
+        gps: { lat: 41.8791, lon: -87.6237, radius: 40 },
+        arrivalNote: "This bronze fountain is Lorado Taft's Fountain of the Great Lakes, cast between 1907 and 1913. Its five women are the five Great Lakes, arranged so the water spills from one to the next in the exact order it flows through the real lakes \u2014 beginning at Lake Superior, the highest, and passing down the chain toward the sea. Taft made it after Daniel Burnham complained that the sculptors of the 1893 World's Fair had failed to honor the Great Lakes. On its hidden back panel is a face turned to the wall \u2014 a portrait few ever see.",
+        call: "The journal lights up here. This isn't a statue. it's a diagram. Remember the water lesson from the bridge? Water traps the Traveller. Here that lesson is in bronze, long forgotten by this city. The order keeps what the world forgets. Granddad even names Taft's inspiration. An old Greek punishment, women condemned to pour water forever into a vessel that never fills. That, he writes, is the whole life of the order. pouring themselves into a wall that must never be left to run dry. He also marks a ward near here. one he flagged as failed. Gone cold. He never worked out why. Again he says, solve my riddle and the book opens.",
+        followup: "Five. that must be it.. let me see.. Hold on. This is it. These are the lines he never had in one place, and with the fountain's answer they fit together. this is what he was missing for that failed ward. I think I can.. it lit up! The failed one! Granddad said these were gone for good, and we just.. we brought one back. We can still light them! Okay.. Okay. Lets keep going. The trail leads to the Fine Arts Building. give me a second...I've just texted the stranger and he's agreed to meet there. Says there's a little bookshop on the 2nd floor.",
+        puzzle: {
+          prompt: "Sisters stand and pour in turn,\neach to the next, a falling chain \u2014\nand the road their waters learn\nis the founders' map made plain.\nHow many seas keep watch as one?",
+          answers: ['5', 'FIVE'],
+          hints: [
+            "This is a counting puzzle. The bronze women in front of you aren't just figures \u2014 each one IS a body of water. Count the sisters.",
+            "The arrival note told you what they are: the Great Lakes themselves, pouring one into the next in the order the real water flows. How many Great Lakes are there?",
+            "The answer is 5. Superior, Michigan, Huron, Erie, Ontario \u2014 five sisters passing water down the chain, exactly as the real lakes flow toward the sea."
+          ]
+        },
+        ward: { state: 'relit', text: "Granddad's failed mark \u2014 cold for years. It flared\u2026 and settled to steady ink. The first relight." },
+        steps: ['ward']
+      },
+
+      /* ---------------- BEAT 10 — FINE ARTS BUILDING (Ch.1 finale) ---------------- */
+      /* Piece #1 → no-show clip → three-door chapter break. Interior-bonus rule applies. */
+      {
+        id: 'ch1-b10',
+        title: 'THE FINE ARTS BUILDING',
+        directions: "Proceed to the Fine Arts Building \u2014 410 S. Michigan Ave. The bookshop Exile in Bookville is on the 2nd floor (open daily 10\u20137, Sun 11\u20134); the beat completes from street level. [walking directions TBD]",
+        gps: { lat: 41.8765, lon: -87.6244, radius: 40 },
+        arrivalNote: "The Fine Arts Building at 410 S. Michigan. It went up in 1884 as the Studebaker Building \u2014 a carriage showroom and factory \u2014 before being remodeled in 1898 into a home for the arts. Ever since, it has held artists' lofts, galleries, theaters, and recording and music studios \u2014 walk the halls and you hear pianos and singers behind doors you can't see. Flanking the entrance stand two giant polished granite columns, once said to be the largest of their kind in the country. Inside, are Chicago's last hand-operated elevators. The city is planning to replace them soon. Take a ride up to the 2nd floor if they're still operating.",
+        call: "Ok. The man left word that you're to head up to the bookshop on the second floor, a place called Exile in Bookville. Says he wants to size you up before you meet. If the shop's open, step in. If it's closed, look through the glass. Either way, he'll be able to get eyes on you. And in the meantime, while you're up there, good ol' granddad has another riddle for us.",
+        followup: "Art. Let me see if that fits.. Yep, it does. But wait a second. This looks different.. what's this thing tryin' to tell me? There's a piece here! One of the scattered ones! Grandfather hid an actual piece of the rite in that bookshop! Not a note about it, the thing itself! You've got it. That's.. that's the first real piece. He wasn't only writing the rite down. He was hiding it, all over the city, for us to gather. We're actually building it! Wait. I'm getting a text.. Okay. The man says he'll meet you now. Up in the courtyard, fourth floor. Says if it's closed, he'll meet you at suite 433. Says the courtyard is visible from there. Go on up, and be careful. I'll ring you back in a few minutes to see how the meeting went.",
+        puzzle: {
+          prompt: "This house was raised for makers of art \u2014 you can hear them still through every door.\nSomewhere within, cut into stone, a vow the old builders swore:\nthat all things fade, all guests depart,\nyet one thing outlasts even the heart.\nFinish the line the carvers gave: \"All passes, ___ alone endures.\"",
+          answers: ['ART'],
+          hints: [
+            "The riddle asks you to finish a motto carved inside this building \u2014 a vow about the one thing that outlasts everything else. What was this whole building made FOR?",
+            "Listen to the halls: pianos, singers, painters' studios. The building's very name tells you what endures here.",
+            "The answer is ART. The carved motto reads \"All passes \u2014 ART alone endures,\" and this building has spent 125 years proving it, floor by floor."
+          ]
+        },
+        piece: 1,
+        noshow: "He's not there? You're in the courtyard and he's not.. hold on, I'm calling him. Nothing. he's not picking up. He said the courtyard, he said he'd be there.. maybe something spooked him? whatever happened, Something's wrong. I don't.. I don't know what yet.",
         chapterEnd: {
-          heading: "CHAPTER ONE COMPLETE",
-          text: "You arrived a stranger. You leave a Draughtsman \u2014 with the first piece of the rite in hand, and a ward relit that had been dark for over a century. The journal's next piece lies south, where money built its canyon, in the care of the birds. But that's another day's walk, whenever you're ready for it.",
-          continueCard: "The journal turns south. Walk down Dearborn into the canyon of the banks \u2014 the order's richest ground, and the Rookery waits at the end of it, named for the birds that roosted in the ruins after the Fire. Come on, Draughtsman. I'll call when you're under the birds.",
-          pauseFarewell: "Good place to stop. Catch your breath \u2014 the grid'll keep till you're back; it's kept a hundred years. Save your spot. When you're ready, the trail runs south into the canyon, and I'll be here. Go on, Draughtsman. Get some rest.",
-          torchFarewell: "So this is where you lay it down. That's not quitting \u2014 that's the oldest thing the order does. You walked your stretch, you lit a ward that's been dark since before either of us was born, and you carried the first piece home. My grandfather spent his whole life reaching for what you did today, and he'd have called you a Draughtsman without a second's hesitation. So I will too. Your watch is complete. Whoever picks up the trail next starts because you cleared the way. Thank you. Go well."
-        }
+          heading: 'CHAPTER ONE COMPLETE',
+          text: "The first piece of the rite is in hand \u2014 and the man who promised to meet you never came. Sal is going to find out why. What happens next is up to you.",
+          carryon: "I can't just stand here. The journal's still open. Come on, while we've got the light. You keep to the trail. I'm going to swing by his place, see if he's just.. flaky. I'll call you.",
+          pause: "Alright. We stop here. I don't know what happened, but when you're ready, we go find out. I'm not letting this go. Neither should you.",
+          torch: "If this is where you step back, I understand. Not everyone's built to keep walking toward the thing in the dark. The order keeps a place for you either way. Walk seen\u2026 and go unseen."
+        },
+        steps: ['piece', 'noshow', 'break']
+      },
+
+      /* ================= CHAPTER 2 ================= */
+
+      /* ---------------- BEAT 11 — AUDITORIUM BUILDING ---------------- */
+      /* CH2 opens. The followup IS the apartment scene. */
+      {
+        id: 'ch2-b11',
+        title: 'THE AUDITORIUM BUILDING',
+        directions: "Proceed to the Auditorium Building \u2014 430 S. Michigan Ave, at Michigan and Congress. [walking directions TBD]",
+        gps: { lat: 41.8761, lon: -87.6252, radius: 40 },
+        arrivalNote: "The Auditorium Building, at Michigan and Congress. When it opened in 1889 it was the largest building in America \u2014 a theater, hotel, and office tower in one, with a 4,000-seat hall so perfect that singers on its stage can be heard in the last row without a microphone. Its architects were Dankmar Adler and a young Louis Sullivan, the man they'd call the father of the skyscraper. Sullivan changed the face of every city on earth \u2014 and died thirty years later, broke and nearly forgotten, in a rented room a few blocks from here. The building was so heavy it began sinking into Chicago's mud before it was even finished; its floors slope gently to this day. If you can, step into the lobby and look for the golden staircases.",
+        call: "Okay, you made it. The Auditorium Building. Granddad's journal has plenty to say about this one \u2014 but I'll be honest, I'm only half reading it right now. I'm heading to the stranger's apartment. If he still wants to meet, fine \u2014 but he doesn't get to just vanish on us without a word. It's not far now. You keep working. The journal shows another riddle at this stop. Solve it, and I'll call you back the second I know anything.",
+        followup: "Listen... I'm at his apartment. No one's home. Looks to me like the door was forced. The place is wrecked... furniture flipped, some broken glass... looks like there was a hell of a fight in here. And there's\u2026 there's blood. Not a lot. But the carpet looks like something was dragged across it. Toward the door. let me check that riddle answer. 'Acoustics'. Come on, come on\u2026 okay. The journal points to the Franklin Building next. Printers Row. I'll call you back when the journal gives me more, but right now I'm getting the hell out of here. You get to the Franklin Building \u2014 I'll call you when you're there.",
+        puzzle: {
+          prompt: "In silence I'm shaped, in echoes I'm born,\nNo strings, yet orchestras crown me and mourn.\nI bend every whisper and cradle each note,\nSo even the softest can sail like a boat.\nI'm drawn with equations, but felt with your chest\u2014\nWhat am I, that makes music sound at its best?",
+          answers: ['ACOUSTICS', 'ACOUSTIC'],
+          hints: [
+            "The answer isn't something you can see or touch \u2014 it's something this building is world-famous for. The arrival note mentioned it: a hall where a singer's softest note reaches the very last row, with no microphone. What makes that possible?",
+            "Adler engineered this theater so that sound itself behaves perfectly inside it \u2014 every whisper bent and carried to every seat. There's a single word for the science of how sound moves through a space. It starts with A.",
+            "The answer is ACOUSTICS \u2014 the science of sound. Adler's Auditorium acoustics are still considered among the finest ever built; musicians travel across the world just to play inside them."
+          ]
+        },
+        steps: []
+      },
+
+      /* ---------------- BEAT 12 — FRANKLIN BUILDING ---------------- */
+      {
+        id: 'ch2-b12',
+        title: 'THE FRANKLIN BUILDING',
+        directions: "Proceed to the Franklin Building \u2014 720 S. Dearborn St, on Printers Row. Step back across the street to take in the whole facade. [walking directions TBD]",
+        gps: { lat: 41.8721, lon: -87.6293, radius: 40 },
+        arrivalNote: "The Franklin Building, on Printers Row. A century ago this street was the printing capital of the American Midwest \u2014 every book, catalog, and timetable west of New York seemed to pass through these blocks, and this building was one of its workhorses. Look up at the facade: it's covered in painted tilework showing the history of bookmaking, and above the entrance, craftsmen in the tiles are shown at their trade beneath the words \"The First Impression.\" The building set type and ran presses for decades \u2014 a house built for putting words onto paper, and making them permanent.",
+        call: "Okay. Franklin Building. Printers Row. I'm still shaking off that apartment... there was a smell there... hard to describe. Give me a minute to focus. ok. here we go. Granddad's journal has this building circled several times. Not sure why he wanted us to know about it.. A hundred years ago, everything printed west of New York came through these blocks. Books, papers, all of it. A street built to put words on paper and make them stick. And this building's got a riddle waiting on its face. Take a look and work it out, I'll keep at the journal while you do.",
+        followup: "Printing press! that was a tough one. Nice work. okay, this page is making a little more sense now. And... hold on. The journal's telling me there's a piece here. One of granddad's scattered pieces, the second one. You've got it? Good. Okay, now look at it. Look close. There's something carved on it. markings, characters, like little rows of type. But it's no alphabet I've ever seen. I have no idea what that is. Granddad's journal has hints scattered all through it. I can see them now, little notes in the margins. but too much of this puzzle is still locked in its pages. Oh well.. we keep moving, the book keeps opening. That's the deal. Next stop: the Fisher Building. It's close.",
+        puzzle: {
+          prompt: "I copy whispers into crowds,\nI pull down thrones and thin the clouds.\nI spin the news from oil and lead,\nAnd raise the living from the dead.\nNo pen, no scribe, yet words I spread\u2014\nWhat engine turns behind this thread?",
+          answers: ['PRINTING PRESS', 'PRESS', 'THE PRESS'],
+          hints: [
+            "The answer is a machine \u2014 one this whole street existed to serve. The arrival note told you what this building did for decades. What was the engine at the heart of that trade?",
+            "\"Oil and lead\" is the giveaway: ink, and type cast from lead. The machine that pressed inked lead letters onto paper \u2014 the invention that let one person's words reach a million. Gutenberg built the first famous one.",
+            "The answer is the PRINTING PRESS. Printers Row ran on them \u2014 floors of presses in buildings like this one, printing everything from bibles to rail timetables for the whole Midwest."
+          ]
+        },
+        piece: 2,
+        steps: ['piece']
+      },
+
+      /* ---------------- BEAT 13 — FISHER BUILDING ---------------- */
+      /* Piece #3 + THE LETTER (separate voice). Letter card fires after the followup. */
+      {
+        id: 'ch2-b13',
+        title: 'THE FISHER BUILDING',
+        directions: "Proceed to the Fisher Building \u2014 343 S. Dearborn, at Dearborn and Van Buren. Stand across Dearborn and let your eyes climb. [walking directions TBD]",
+        gps: { lat: 41.8770, lon: -87.6289, radius: 40 },
+        arrivalNote: "The Fisher Building, at Dearborn and Van Buren. Built in 1896 for paper magnate Lucius Fisher, and its architects covered all eighteen stories in a joke on his name: the golden terra-cotta facade crawls with sea creatures. Fish with open mouths, crabs, eels, shells, salamanders \u2014 even dragons \u2014 swim up the walls in carved stone, hundreds of them, most too high for anyone at street level to ever notice. It's one of the last great terra-cotta towers in the city. Stand across Dearborn and let your eyes climb \u2014 the higher you look, the stranger the creatures get.",
+        call: "Fisher Building. You see it? Look up. the whole thing's crawling with Fish, crabs, eels, dragons, hundreds of them, straight up all eighteen floors. It's a joke, if you can believe that. The man who built it was named Fisher. Made his fortune in paper. so his architects carved his name into the walls as sea creatures. A name, hiding in plain sight, and a hundred years of people walking past without reading it. Granddad has this one marked too. There's a riddle here. Im back at my place now, still going through the journal. I'll call you back soon to see what you've found. Good Luck.",
+        followup: "Paper. Of course. Okay... the journal's opening, and... there's a piece here! The third one. Granddad hid it at the paper man's tower. You've got it? Same as the last, in a language I still haven't figured out - some kind of code? Hold on. Just heard my mail slot. It's... it's a letter. No return address. Give me a second. It's from him. The stranger. He mailed this... he must have mailed it before...",
+        postletter: "He had a piece. All this time. And that riddle... beast, bride, shadows? what's that supposed to mean? It could be anything in this city! But he wrote it for us. For the order. So somewhere on this trail, we're going to be standing in front of the answer, and we'll know it. Keep it in your pocket. The journal says keep moving. the Board of Trade is next.",
+        puzzle: {
+          prompt: "I can be blank as unformed dreams\nOr filled with maps and schemes and schemes.\nI mark the deals that bind your fate,\nI wrap your gifts, I decorate.\nYou cut me, crease me, stack me high\u2014\nOne spark, one drip, and I may die.\nWhat am I?",
+          answers: ['PAPER'],
+          hints: [
+            "The answer is all around you in spirit \u2014 this building was built by a man who made his fortune manufacturing it, and it's what this entire street once consumed by the ton. What did Printers Row print ON?",
+            "Blank until something's written on it. It seals deals, wraps gifts, stacks in reams \u2014 and both fire and water destroy it. The Fisher Building was a paper magnate's tower, planted at the edge of the district that bought what he sold.",
+            "The answer is PAPER. Lucius Fisher ran one of America's great paper companies \u2014 and his architects covered his tower in fish and sea creatures as a joke on his name."
+          ]
+        },
+        piece: 3,
+        steps: ['letter', 'piece']
+      },
+
+      /* ---------------- BEAT 14 — BOARD OF TRADE ---------------- */
+      /* The NAME reveal — voice only, no new mechanic. */
+      {
+        id: 'ch2-b14',
+        title: 'THE BOARD OF TRADE',
+        directions: "Proceed to the Chicago Board of Trade \u2014 141 W. Jackson Blvd, at the foot of the LaSalle Street canyon. Look all the way up. [walking directions TBD]",
+        gps: { lat: 41.8781, lon: -87.6322, radius: 50 },
+        arrivalNote: "The Chicago Board of Trade, at the foot of LaSalle Street. When it opened in 1930 it was the tallest building in Chicago, an Art Deco cliff of limestone where the price of the world's grain was decided. Look all the way up \u2014 at the top, three hundred feet above the street, stands a thirty-foot aluminum statue of Ceres, the Roman goddess of grain. And here is the strange part: she has no face. The sculptor left her smooth and blank \u2014 the story goes that no one would ever be close enough to see it. The goddess who watched over the city's fortunes, deliberately made impossible to know.",
+        call: "Here we are... The Board of Trade. End of the LaSalle canyon. Look all the way up. You see her? Top of the building, three hundred feet up. There she is...Ceres. Thirty feet tall, made of aluminum... and no face. The sculptor never gave her one. Figured nobody would ever be close enough to see it. A faceless goddess, watching the whole city, and everybody just... walks under her. Granddad has her marked in the journal, but I can't read why yet. There's a riddle on this page. Work it, and let's find out what he wanted us to know.",
+        followup: "Ceres. Of course, she's the key. okay. Granddad's page here is short. One line. 'this goddess has no face, but does have a name. there is power knowing the name.' He underlined that last part. 'Power in knowing...' wait. Get the pieces out. All three of them. Look at the markings. I've been staring at these characters for two days like they're a code to break. They're not a code. They're letters. Line the pieces up... It's a name. The rite isn't a spell, it's a NAME. The thing granddad hunted, the thing the wards hold back. this whole time, granddad was looking for its name. but why? Everytime we get closer to this thing it slips behind another damn riddle. There's more pieces out there. The journal says The Monadnock's next. Let's go get the rest of it.",
+        puzzle: {
+          prompt: "Sculpted from dust in a halfway home,\nToo small for a world, too big for mere stone.\nI drink from the dark, hiding water below,\nLetting thin, drifting mists ghostily flow.\nCaught between Mars and the broken rocks ring,\nBy what Roman goddess' name do I sing?",
+          answers: ['CERES'],
+          hints: [
+            "The riddle describes something in the sky \u2014 a small world circling the sun. But its name belongs to someone standing much closer. The arrival card told you who watches over this building.",
+            "The Roman goddess of grain gave her name to the first asteroid ever discovered \u2014 a dwarf planet drifting out past Mars. Her statue stands three hundred feet above you, faceless, in aluminum.",
+            "The answer is CERES \u2014 goddess of grain atop the Board of Trade, and the largest object in the asteroid belt. One name, watching from two skies."
+          ]
+        },
+        steps: []
+      },
+
+      /* ---------------- BEAT 15 — MONADNOCK BUILDING ---------------- */
+      /* Piece #4 + the roster (voice carries it). */
+      {
+        id: 'ch2-b15',
+        title: 'THE MONADNOCK BUILDING',
+        directions: "Proceed to the Monadnock Building \u2014 53 W. Jackson Blvd, a full block of dark brick down Dearborn. [walking directions TBD]",
+        gps: { lat: 41.8783, lon: -87.6293, radius: 35 },
+        arrivalNote: "The Monadnock Building, named for a mountain in New Hampshire, stretching a full block down Dearborn. Its northern half, finished in 1891, is the tallest load-bearing brick building ever constructed \u2014 no steel skeleton, just walls of brick standing under their own weight, six feet thick at the base. Its architects stripped away every ornament: no carvings, no cornices of figures, just a dark cliff of brick that curves like something grown rather than built. When it opened, six thousand people worked inside \u2014 typists, clerks, agents, printers \u2014 a whole vertical village whose names no one now remembers. Step into the ground-floor corridor if it's open: a block-long hallway of glowing shopfronts and winding staircases, almost unchanged in a hundred and thirty years.",
+        call: "The Monadnock. You can't miss it. a whole block of dark brick. No cornices, no faces, no marks. After everything we've seen today, doesn't that feel... wrong? Every building on granddad's trail dressed in symbols, and this one... bare. Six thousand people used to work in there. Typists, clerks, printers. A whole vertical town. All of them gone and forgotten now. Granddad's got several pages on this place, more than anywhere since the Cultural Center. But it's all still locked. One riddle between us and whatever he wanted to say. Go ahead. I'll be here.",
+        followup: "Ok, good, that answer works... the page is revealing it's secrets. And... there's a piece here! The fourth one. Granddad hid it at the bare building. You've got it? Good. That's four. Wait. These pages... it's a list. Names. Pages and pages of names. 'Albrecht', 'Kowalski'... There must be a hundred of them. Hold on. 'Daniel Burnham.' THE Burnham, the man who drew the whole city's plan. Lorado Taft... he made the fountain you were at earlier. Harry Houdini? Pablo...Picasso. This is the order. All of them. A hundred years of Draughtsmen. Geniuses the whole world knows, standing quietly with stone masons and lamplighters nobody ever heard of. And at the bottom of the last page, in granddad's hand, \"All taken, or gone to ground. I am what remains.\" He wasn't keeping a member list. He was keeping a memorial. Ok, One riddle at a time. Let's keep going. The journal points to the Rookery.",
+        puzzle: {
+          prompt: "An island I am, but no waves at my feet,\na summit of stone where the sky and winds meet.\nNo ocean surrounds me, just forests and fields,\nyet sailors of soil read the signs that I yield.\nAbove the flat lands, I silently knock\u2014\nwho am I, this land-locked, towering block?",
+          answers: ['MONADNOCK', 'MOUNTAIN', 'MT MONADNOCK', 'MOUNT MONADNOCK'],
+          hints: [
+            "The arrival card already told you this building's namesake. What kind of thing is it named after \u2014 and what is that thing called?",
+            "A monadnock is a real geological term: a lone mountain that stands alone above a plain worn flat around it. This building borrowed the name from one in New Hampshire.",
+            "The answer is MONADNOCK \u2014 a mountain standing alone above the flatlands, which is exactly what this building was when it rose over 1891 Chicago (and MOUNTAIN works too)."
+          ]
+        },
+        piece: 4,
+        steps: ['piece']
+      },
+
+      /* ---------------- BEAT 16 — THE ROOKERY ---------------- */
+      /* ALL IS LOST — the full rite revealed. Voice carries it. */
+      {
+        id: 'ch2-b16',
+        title: 'THE ROOKERY',
+        directions: "Proceed to the Rookery \u2014 209 S. LaSalle St, at LaSalle and Adams. If the lobby is open, the light court is worth the visit. [walking directions TBD]",
+        gps: { lat: 41.8790, lon: -87.6320, radius: 50 },
+        arrivalNote: "The Rookery, at LaSalle and Adams. After the Great Fire, the city's temporary City Hall stood on this ground \u2014 a rough, hasty building that crows and pigeons claimed by the hundreds, until Chicagoans mockingly named it \"the rookery.\" When Daniel Burnham and John Root raised their masterpiece here in 1888, the name stuck \u2014 and Root, in on the joke, worked carved rooks into the entrance stone. Step inside if you can: the light court is one of the most beautiful rooms in America, a cage of white marble and gold under a glass sky, remodeled in 1905 by Frank Lloyd Wright. Burnham ran his empire from this building \u2014 the man who told Chicago to make no little plans, working under the birds' old name.",
+        call: "The Rookery. Burnham's building. The name from the list...this is where he worked. His office was up there, above that light court. If you can get inside, go. It's... it's the most beautiful room in the city. Granddad's pages here are the thickest in the whole journal. Whatever he kept here, he buried it deepest of all. And the handwriting changes, further in. Gets smaller. Tighter. Like he was running out of time and knew it. Answer the riddle so we can read what he kept hidden all this time.",
+        followup: "Good. that's definitely the cipher for these pages...It's the rite! The whole thing. Listen. \"The rite is older than the city, older than the language it hides in. A thing may be commanded by its true name. This the old world knew, and feared, and so the name was cut apart, and the pieces scattered among the faithful, that no single tongue could ever hold it whole. To banish the Traveller, the name must be made whole again, inscribed, spoken once, and given to the fire. Burned at the wound it came through, the name unmakes the door.\" Spoken once... and burned. At the wound it came through. That's City Hall. That's where this ends. He had all of it. The rite, the method, the place...but he was ONE piece short. One. He got so close. That last piece is out there, waiting behind a dead man's riddle. Beast, bride, shadows. The journal says the Marquette Building is next. Come on. Let's finish what granddad couldn't.",
+        puzzle: {
+          prompt: "We are robed in funeral shade,\nA feathered court in council made.\nOn ruined stone or shipwrecked bones,\nWe trade the wind for hollow tones.\nOur kingdom's name, in whispers said,\nIs where we go to roost and bed.\nSpeak this word of flock and night,\nWhere many wings make one dark site.",
+          answers: ['ROOKERY', 'THE ROOKERY'],
+          hints: [
+            "A colony of crows or rooks \u2014 the place a whole flock settles and nests \u2014 has its own name. That word is the answer.",
+            "The arrival card told you this building's story: the birds claimed the ruins after the fire, Chicagoans coined a mocking nickname, and the joke became the building.",
+            "The answer is ROOKERY \u2014 a roosting colony of rooks. The name mocked the temporary City Hall the birds took over, and Burnham & Root liked the joke enough to keep it, carving rooks into the entrance stone."
+          ]
+        },
+        steps: []
+      },
+
+      /* ---------------- BEAT 17 — MARQUETTE BUILDING ---------------- */
+      /* SECOND RELIGHT — journal mechanic, same as Beat 9. */
+      {
+        id: 'ch2-b17',
+        title: 'THE MARQUETTE BUILDING',
+        directions: "Proceed to the Marquette Building \u2014 140 S. Dearborn St, at Dearborn and Adams. The mosaic lobby is worth stepping inside. [walking directions TBD]",
+        gps: { lat: 41.8790, lon: -87.6294, radius: 35 },
+        arrivalNote: "The Marquette Building, at Dearborn and Adams, finished in 1895. Step into its lobby if you can \u2014 it holds one of the most dazzling rooms in Chicago: a two-story rotunda ringed in Tiffany glass mosaics, millions of tiles of gold leaf and mother-of-pearl, telling the story of Jacques Marquette, the French missionary-explorer who crossed this region by canoe in 1673 and wintered near the river's mouth two centuries before the city existed. Over the entrance doors, bronze reliefs show the expedition \u2014 the canoes, the portages, the winter camp. The building was named for a man who mapped this ground when it was wilderness \u2014 and whose journal of the voyage survived him.",
+        call: "The Marquette Building. Don't worry, I think we are getting close to the end of this. I can feel it. Go inside if you can, the lobby's decoration tells the story of Jacques Marquette, the missionary who crossed this wilderness by canoe...and here's the part granddad underlined. Marquette died out there. Never made it home, but his JOURNAL did. Everything he mapped, everything he saw...the journal carried it back without him. That's the only reason the world knows his name. I've been carrying granddad's journal for years like it was all I had left of him. But he's still with us, still walking the trail with us. Okay. The journal says there's a ward near here, one granddad marked as failed. And a riddle to work first. I'll be waiting for the answer..",
+        followup: "Missionary. That's the key. Okay... and there it is. Granddad's notes on it are right here, and with this page open I can see what he couldn't... same as the fountain. Hold on...It took. It's relit. That's two now. Two wards burning again that were cold for years. Granddad spent his whole life watching this wall come down, and here we are, putting stones back in it. I wish he could see this. Maybe he can. Okay. Four pieces in hand, one to find, and one dead man's riddle to crack. Beast, bride, shadows... someone millions have met and nobody can name. The journal points to Daley Plaza next. Almost home. Keep moving.",
+        puzzle: {
+          prompt: "I walk into the lion's den\nWith only ink and fragile pages.\nI speak of things you cannot see,\nOf peace that burns through wars and ages.\nSome shut me out, some let me in,\nSome tear my message limb from limb.\nYet still I go, through loss and pain\u2014\nMy silent orders never dim.\nWho am I?",
+          answers: ['MISSIONARY', 'PRIEST', 'JESUIT'],
+          hints: [
+            "Think about who travels into dangerous, unmapped places carrying nothing but a message \u2014 armed with a book instead of a weapon. There's a word for that calling.",
+            "The arrival card gave Jacques Marquette two titles. One was \"explorer.\" What was the other?",
+            "The answer is MISSIONARY. Father Marquette was a Jesuit missionary who crossed this wilderness by canoe in 1673 \u2014 and the journal he kept is why his story survived him."
+          ]
+        },
+        ward: { state: 'relit', text: "The second failed ward, burning again. Two stones back in the wall that must never run dry." },
+        steps: ['ward']
+      },
+
+      /* ---------------- BEAT 18 — DALEY PLAZA / THE PICASSO ---------------- */
+      /* Piece #5. The puzzle IS the stranger's riddle from the Beat 13 letter, verbatim. */
+      {
+        id: 'ch2-b18',
+        title: 'DALEY PLAZA \u2014 THE PICASSO',
+        directions: "Proceed to Daley Plaza \u2014 50 W. Washington St. City Hall is across the street; the steel statue is impossible to miss. [walking directions TBD]",
+        gps: { lat: 41.8842, lon: -87.6300, radius: 60 },
+        arrivalNote: "Daley Plaza \u2014 the civic heart of modern Chicago, and home to its most famous mystery. The steel figure rising fifty feet over the square arrived in 1967, a gift from Pablo Picasso, who refused all payment for it. He never gave it a title, and he never said what it was. For nearly sixty years Chicagoans have argued: a woman's head? A bird? A baboon, a horse, an Afghan hound? The city simply calls it \"the Picasso.\" Millions pass it every year; children slide down its base; and to this day, no one can say what it is they're walking past. It is, officially, untitled \u2014 the biggest unanswered question in Chicago, standing in the middle of its busiest square.",
+        call: "Daley Plaza. Okay. City Hall is RIGHT there... you can see it across the street. The wound. We're standing at the edge of where this all ends. But the journal's stopped. There's one page left that won't open, and no riddle on it. Nothing. Granddad's trail just... ends here. He went missing before he could finish it. Wait. What's that behind you? The statue. The big steel one. Fifty feet tall. Nobody knows what it is...a bird, a woman, a beast... Be'ast'. 'Bride'. 'Shadows...' No plaque, no title \u2014 he never even said what it WAS. It's HIS riddle. The stranger's riddle. It's not granddad's trail we're on now, it's HIS. Now, what's the answer to that riddle?",
+        followup: "The Picasso. Of course. The one thing in this city millions walk past and nobody can name. Okay, he said the piece is safe where he hid it. Look at the base, where the steel meets the plaza. Underneath, where the city can't see. There. You've got it. That's five. The name is whole. Wait...the journal..there's something on this page scribbled in the margin... \"The Spaniard wrote to us in '65. He said a thing had walked through his sleep for a year, no face he could fix, no shape that would hold still. he could not forget it, so he built it, and sent it here, to show the traveller it could not go unseen forever. The city thinks it is a mystery. It is a portrait.\" We have everything. The name. The rite. The ground is across the street. No more riddles between us and the end, now. Walk to City Hall. Let's finish this.",
+        puzzle: {
+          prompt: STRANGERS_RIDDLE,
+          answers: ['THE PICASSO', 'PICASSO', 'STATUE', 'THE STATUE'],
+          hints: [
+            "The stranger promised you'd know it when you were standing in front of it. Look around the plaza. What's here that millions have met \u2014 and nobody has ever been able to name?",
+            "A beast? A bride? Shadows? People have called it all three. Fifty feet of steel, no title, no explanation \u2014 sent to Chicago by an artist who never set foot here.",
+            "The answer is THE PICASSO. He gave it to the city in 1967, refused payment, and never said what it was. Sixty years on, no one knows \u2014 but now you do."
+          ]
+        },
+        piece: 5,
+        showLetter: true,
+        steps: ['piece']
+      },
+
+      /* ---------------- BEAT 19 — CITY HALL (FINALE) ---------------- */
+      /* Same GPS trigger as Beat 1 — the finale script fires because the game is linear:
+         this beat only loads after Beat 18 is complete and all five pieces are in hand. */
+      {
+        id: 'ch2-b19',
+        title: 'CITY HALL \u2014 THE WOUND',
+        directions: "Walk to City Hall \u2014 directly across the street. Where you started.",
+        gps: { lat: 41.8838, lon: -87.6321, radius: 60 },
+        arrivalNote: "City Hall again \u2014 but you're not the person who stood here this morning. The courthouse that burned on this ground in 1871 took the city's records with it: the deeds, the ledgers, the proof of what Chicago had been. Every history of this city begins with an apology \u2014 the records were lost in the fire. What rose from those ashes runs on the same block to this day, under the same symbol you've now followed across the Loop. One more thing the guidebooks won't tell you: the fire that destroyed the records also destroyed the official account of how it started. The story of the cow was printed by a newspaper man who admitted, years later, that he made it up. The lie outlived him. You're standing where it started \u2014 and where it ends.",
+        call: "There it is. City Hall. This is where you started, this morning. together we've found five pieces of a name nobody's spoken since 1871. Relit two wards that went cold years ago. You're a draughtsman now. Granddad's journal has one thing left in it. A margin note, in the smallest writing in the whole book. It just says... \"the last ritual.\" And under it, one final riddle. After this, there are no more notes, no more riddles. Whatever's on the other side of this answer, we do it together. Go ahead. Answer him one last time.",
+        preburn: "Fire. Of course. It was always going to be fire. Okay. Look at your screen. Five pieces, one name. There it is, whole, for the first time in a hundred and fifty years. Don't say it out loud. That's mine to do... Granddad... this is for you. for your friends. for all of them on that list. I'm going to speak it once. And when I do, you burn it... Ready? ...There. It's said. Now... Burn it.",
+        postburn: "...It's done. The air just changed. I don't know how else to say it. Like a sound you'd stopped hearing years ago finally cut out and the quiet is louder than the noise ever was. It's gone. The door is shut. Hey. Listen to me. My grandfather spent his life on this and died one piece short. A stranger died trying to make it right. And you... you walked into this city this morning and finished what a hundred years of Draughtsmen couldn't. I don't even know how to thank you for that. 'The order keeps what the world forgets'. So the order keeps you now, your name, in the book, next to his. Where it belongs. 'Walk seen... and go unseen, Draughtsman'.",
+        puzzle: {
+          prompt: "I am a thief in the night,\nStealing shapes from the dark.\nI paint monsters on the wall,\nYet leave no lasting mark.\nI speak in crackles, hiss in sighs,\nMy breath both warm and dire.\nI guard the circle of whispered tales\u2014\nName the keeper of this choir.",
+          answers: ['FIRE', 'FLAME'],
+          hints: [
+            "Think of what humans have gathered around since before cities existed \u2014 the thing that casts monster-shadows on cave walls, crackles and hisses, and keeps the dark outside the circle.",
+            "It destroyed this ground in 1871. And the rite says the name must be GIVEN to it. What consumed the courthouse \u2014 and what will consume the name?",
+            "The answer is FIRE. It opened the wound in 1871 \u2014 and tonight, it closes it."
+          ]
+        },
+        finale: true,
+        steps: []
       }
     ];
-    /* ================== END OF STORY \u2014 machinery below ================== */
 
+    /* ---------- piece captions & glyphs ---------- */
+    var PIECE_CAPTIONS = [
+      "Recovered in the bookshop: a thin tablet of dark metal, cold to the touch. One row of carved characters \u2014 in no alphabet you know.",
+      "The second piece, hidden at the printers' workhorse. The same strange characters, like little rows of type.",
+      "The third piece, hidden at the paper man's tower. The same unreadable carving. Three rows now \u2014 and still no meaning.",
+      "The fourth piece, hidden at the bare building. They're not a code. They're letters. One row left to find.",
+      "The final piece \u2014 the stranger's piece \u2014 recovered from beneath the dream. The name is whole."
+    ];
+
+    /* Five invented glyphs (SVG paths in a 60x80 box) — the split name, defixiones-style. */
+    var GLYPH_PATHS = [
+      "M10,72 L30,8 L50,72 M18,46 L42,46 M30,8 L30,26",
+      "M14,8 L14,72 M14,40 L50,10 M14,40 L50,70 M38,40 L50,40",
+      "M30,8 L30,72 M10,22 L50,22 M14,58 L46,58 M10,22 L20,10 M50,22 L40,10",
+      "M10,10 L50,70 M50,10 L10,70 M30,4 L30,76 M20,40 L40,40",
+      "M12,72 L12,18 L48,18 L48,72 M30,18 L30,52 M20,62 L40,62"
+    ];
+
+    function glyphSVG(n, color) {
+      return '<svg viewBox="0 0 60 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
+        '<path d="' + GLYPH_PATHS[n] + '" fill="none" stroke="' + color +
+        '" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    }
+
+    /* ---------- state ---------- */
     var current = 0;
     var watchId = null;
     var hintIndex = 0;
+    var stepQueue = [];
+    var letterArchiveMode = false;
     var devMode = window.location.search.indexOf('dev=1') !== -1;
-    var SAVE_KEY = 'althyst-phoenix-charter-progress';
-    var RETURN_KEY = 'althyst-phoenix-charter-returning';
 
-    // Where the Sal-message screen should go when CONTINUE is tapped.
+    var SAVE_KEY   = 'althyst-phoenix-final-save';       // JSON: {b: beatIndex, p: [5 booleans]}
+    var RETURN_KEY = 'althyst-phoenix-final-returning';  // '1' = deliberate stop, greet on return
+    var TORCH_KEY  = 'althyst-phoenix-final-torch';      // write-once: left via the torch door
+
+    var pieces = [false, false, false, false, false];
+
     var salNext = null;
-    // Filename of the MP3 to play on the Sal-message screen (null = robot voice).
     var salAudioFile = null;
 
-    // ---- Recorded-voice playback (MP3 with robot-voice fallback) ----
-    var AUDIO_DIR = 'audio/';   // MP3 folder, sits beside this index.html
-    var currentAudio = null;    // the <audio> currently playing, so we can stop it
-    var audioWatchdog = null;   // safety timer so the flow never gets stuck
+    var AUDIO_DIR = 'audio/';
+    var currentAudio = null;
+    var audioWatchdog = null;
 
     var WELCOME_BACK = "I'm proud of you. Coming back here takes guts \u2014 and you've got them. Let's finish what we started.";
+    var WELCOME_BACK_TORCH = "You came back. I hoped you would. The trail kept your place \u2014 granddad would have liked you. Come on. Let's finish it together.";
 
+    /* ---------- save / load ---------- */
+    function saveProgress(beatIndex) {
+      localStorage.setItem(SAVE_KEY, JSON.stringify({ b: beatIndex, p: pieces }));
+    }
+    function loadProgress() {
+      var raw = localStorage.getItem(SAVE_KEY);
+      if (raw === null) return null;
+      try {
+        var s = JSON.parse(raw);
+        if (s && typeof s.b === 'number') {
+          if (s.p && s.p.length === 5) pieces = s.p;
+          return s.b;
+        }
+      } catch (e) {}
+      return null;
+    }
+    function piecesCount() {
+      var n = 0;
+      for (var i = 0; i < 5; i++) if (pieces[i]) n++;
+      return n;
+    }
+
+    /* ---------- screens ---------- */
     function showScreen(id) {
       document.querySelectorAll('.screen').forEach(function (s) { s.classList.add('hidden'); });
       document.getElementById(id).classList.remove('hidden');
       window.scrollTo(0, 0);
     }
 
-    // Reusable Sal-message screen. text = what he says; nextFn = called on CONTINUE.
+    /* Reusable Sal-message screen. text = what he says; nextFn = called on CONTINUE. */
     function showSalMessage(text, nextFn, audioFile) {
       salNext = nextFn;
       salAudioFile = audioFile || null;
@@ -422,19 +842,18 @@
       document.getElementById('salPlayBtn').classList.remove('hidden');
       showScreen('salScreen');
     }
-
     function playSalVoice() {
       var text = document.getElementById('salText').getAttribute('data-voice') || '';
       document.getElementById('salPlayBtn').classList.add('hidden');
       playAudio(salAudioFile, text);
     }
-
     function salContinue() {
       stopAudio();
       var fn = salNext; salNext = null;
       if (fn) fn();
     }
 
+    /* ---------- start / resume ---------- */
     function startHunt() {
       if (localStorage.getItem(SAVE_KEY) !== null) {
         var ok = confirm('Start a new trail? Your saved progress will be erased.');
@@ -442,28 +861,37 @@
       }
       localStorage.removeItem(SAVE_KEY);
       localStorage.removeItem(RETURN_KEY);
+      pieces = [false, false, false, false, false];
       loadBeat(0);
     }
-
     function resumeHunt() {
-      var saved = localStorage.getItem(SAVE_KEY);
-      var target = (saved !== null ? parseInt(saved, 10) : 0);
-      // If they deliberately stopped (pause or torch) and are now returning,
-      // greet them warmly first, then drop into the next beat.
+      var saved = loadProgress();
+      var target = (saved !== null ? saved : 0);
+      if (target >= BEATS.length) { showScreen('endScreen'); return; }
       if (localStorage.getItem(RETURN_KEY) === '1') {
         localStorage.removeItem(RETURN_KEY);
-        showSalMessage(WELCOME_BACK, function () { loadBeat(target); }, 'sal-ch1-end-welcome.mp3');
+        var viaTorch = localStorage.getItem(TORCH_KEY) === '1';
+        showSalMessage(viaTorch ? WELCOME_BACK_TORCH : WELCOME_BACK,
+          function () { loadBeat(target); }, null);
       } else {
         loadBeat(target);
       }
     }
+    function replayHunt() {
+      localStorage.removeItem(SAVE_KEY);
+      localStorage.removeItem(RETURN_KEY);
+      pieces = [false, false, false, false, false];
+      loadBeat(0);
+    }
 
+    /* ---------- the walking loop ---------- */
     function loadBeat(i) {
       if (i >= BEATS.length) { showScreen('endScreen'); return; }
       stopAudio();
       current = i;
       hintIndex = 0;
-      localStorage.setItem(SAVE_KEY, String(i));
+      stepQueue = [];
+      saveProgress(i);
       var b = BEATS[i];
       document.getElementById('walkTitle').textContent = b.title;
       document.getElementById('walkDirections').textContent = b.directions;
@@ -473,6 +901,13 @@
       document.getElementById('arrivedMsg').classList.add('hidden');
       document.getElementById('arriveBtn').classList.add('hidden');
       if (devMode) document.getElementById('devArrive').classList.remove('hidden');
+      var pi = document.getElementById('piecesIndicator');
+      if (piecesCount() > 0) {
+        pi.textContent = 'PIECES OF THE RITE \u00b7 ' + piecesCount() + ' / 5';
+        pi.classList.remove('hidden');
+      } else {
+        pi.classList.add('hidden');
+      }
       showScreen('walking');
       startGps();
     }
@@ -486,11 +921,9 @@
       watchId = navigator.geolocation.watchPosition(onPosition, onGpsError,
         { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 });
     }
-
     function stopGps() {
       if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
     }
-
     function distanceMeters(lat1, lon1, lat2, lon2) {
       var R = 6371000, toRad = Math.PI / 180;
       var dLat = (lat2 - lat1) * toRad, dLon = (lon2 - lon1) * toRad;
@@ -498,7 +931,6 @@
               Math.cos(lat1*toRad)*Math.cos(lat2*toRad)*Math.sin(dLon/2)*Math.sin(dLon/2);
       return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     }
-
     function onPosition(pos) {
       var g = BEATS[current].gps;
       var d = distanceMeters(pos.coords.latitude, pos.coords.longitude, g.lat, g.lon);
@@ -511,41 +943,68 @@
       }
       if (d <= g.radius) arrive();
     }
-
     function onGpsError() {
       document.getElementById('distanceText').textContent =
         'Location permission needed \u2014 check browser settings.';
     }
-
     function arrive() {
       stopGps();
       document.getElementById('distanceText').classList.add('hidden');
       document.getElementById('arrivedMsg').classList.remove('hidden');
       document.getElementById('arriveBtn').classList.remove('hidden');
     }
-
-    // Arrival note (tour-guide facts). If a beat has none, skip straight to the call.
-    function showArrivalNote() {
-      var b = BEATS[current];
-      if (b.arrivalNote) {
-        document.getElementById('arrivalTitle').textContent = b.title;
-        document.getElementById('arrivalText').textContent = b.arrivalNote;
-        showScreen('arrivalScreen');
-      } else {
-        showStoryScreen();
-      }
+    function openMap() {
+      var g = BEATS[current].gps;
+      var a = document.createElement('a');
+      a.href = 'https://maps.google.com/?q=' + g.lat + ',' + g.lon;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }
 
-    function showStoryScreen() {
+    /* ---------- arrival note (with Beat 1 day branch) ---------- */
+    function isWeekdayLobbyOpen() {
+      var d = new Date();
+      var day = d.getDay();                       // 0 Sun ... 6 Sat
+      var mins = d.getHours() * 60 + d.getMinutes();
+      return (day >= 1 && day <= 5 && mins >= (8 * 60 + 30) && mins < (17 * 60));
+    }
+    function showArrivalNote() {
       var b = BEATS[current];
-      document.getElementById('storyTitle').textContent = b.voiceTitle;
+      var note = b.arrivalNote;
+      if (b.arrivalWeekday) {                     // Beat 1 day branch (text-only)
+        note = isWeekdayLobbyOpen() ? b.arrivalWeekday : b.arrivalWeekend;
+      }
+      document.getElementById('arrivalTitle').textContent = b.title;
+      document.getElementById('arrivalText').textContent = note;
+      showScreen('arrivalScreen');
+    }
+
+    /* ---------- Sal's call ---------- */
+    function showCallScreen() {
       document.getElementById('playBtn').classList.remove('hidden');
       document.getElementById('transcript').classList.add('hidden');
       document.getElementById('afterVoiceBtn').classList.add('hidden');
-      showScreen('storyScreen');
+      showScreen('callScreen');
+    }
+    function playCall() {
+      var b = BEATS[current];
+      var t = document.getElementById('transcript');
+      t.textContent = '"' + b.call + '"';
+      t.classList.remove('hidden');
+      document.getElementById('playBtn').classList.add('hidden');
+      playAudio(b.id + '-call.mp3', b.call, function () {
+        document.getElementById('afterVoiceBtn').classList.remove('hidden');
+      });
+    }
+    function afterCall() {
+      stopAudio();
+      showPuzzle();
     }
 
-    // Stop whatever voice is playing — recorded MP3 and/or the robot fallback.
+    /* ---------- audio (MP3 with robot-voice fallback) ---------- */
     function stopAudio() {
       if (currentAudio) {
         try { currentAudio.pause(); } catch (e) {}
@@ -556,15 +1015,11 @@
       if (audioWatchdog) { clearTimeout(audioWatchdog); audioWatchdog = null; }
       try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) {}
     }
-
-    // Play a recorded MP3 if the file exists; otherwise fall back to the robot
-    // voice. file = filename inside AUDIO_DIR (or null to force the robot voice);
-    // text = transcript for the fallback; onDone = optional callback when done.
     function playAudio(file, text, onDone) {
       stopAudio();
       var doneCalled = false;
       function done() { if (doneCalled) return; doneCalled = true; if (onDone) onDone(); }
-      if (!file) { speak(text, done); return; }
+      if (!file) { speak(text, done); audioWatchdog = setTimeout(done, 4000); return; }
       var audio = new Audio(AUDIO_DIR + file);
       var fellBack = false;
       function fallback() {
@@ -582,8 +1037,6 @@
       var p = audio.play();
       if (p && typeof p.catch === 'function') { p.catch(fallback); }
     }
-
-    // Shared speech helper. Speaks text; calls onDone when finished (or immediately if no TTS).
     function speak(text, onDone) {
       if ('speechSynthesis' in window) {
         try { speechSynthesis.cancel(); } catch (e) {}
@@ -597,93 +1050,7 @@
       }
     }
 
-    function playVoice() {
-      var b = BEATS[current];
-      var t = document.getElementById('transcript');
-      t.textContent = '"' + b.voice + '"';
-      t.classList.remove('hidden');
-      document.getElementById('playBtn').classList.add('hidden');
-      playAudio('sal-ch1-b' + (current + 1) + '-call.mp3', b.voice, function () {
-        document.getElementById('afterVoiceBtn').classList.remove('hidden');
-      });
-    }
-
-    function afterVoice() {
-      stopAudio();
-      var b = BEATS[current];
-      if (b.puzzle) { showPuzzle(); } else { afterPuzzleFlow(); }
-    }
-
-    // After a puzzle is solved (or if there was none): ward -> reveal -> induction -> card.
-    function afterPuzzleFlow() {
-      var b = BEATS[current];
-      if (b.ward) { showWard(); }
-      else { afterWard(); }
-    }
-
-    function markSVG(color, broken) {
-      var ring = broken
-        ? '<circle cx="40" cy="40" r="34" fill="none" stroke="' + color + '" stroke-width="4" stroke-dasharray="10 7"/>'
-        : '<circle cx="40" cy="40" r="34" fill="none" stroke="' + color + '" stroke-width="4"/>';
-      var yOpacity = broken ? '0.5' : '1';
-      return '<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
-        ring +
-        '<path d="M40 42 L40 64 M40 42 L24 20 M40 42 L56 20" fill="none" stroke="' + color +
-        '" stroke-width="4" stroke-linecap="round" opacity="' + yOpacity + '"/></svg>';
-    }
-
-    function showWard() {
-      var b = BEATS[current];
-      var card = document.getElementById('wardCard');
-      var sym = document.getElementById('wardSymbol');
-      card.className = 'ward';
-      var label, color, broken = false;
-      if (b.ward.state === 'relit') {
-        card.classList.add('ward-relit'); color = '#c9a45c'; label = 'ward relit';
-      } else if (b.ward.state === 'absent') {
-        card.classList.add('ward-absent'); color = '#a06a6a'; broken = true; label = 'no ward here';
-      } else {
-        card.classList.add('ward-intact'); color = '#8fb98f'; label = 'ward intact';
-      }
-      sym.innerHTML = markSVG(color, broken);
-      var lbl = document.getElementById('wardStateLabel');
-      if (lbl) { lbl.textContent = label; }
-      document.getElementById('wardText').textContent = b.ward.text;
-      document.getElementById('wardPlayBtn').classList.remove('hidden');
-      showScreen('wardScreen');
-    }
-
-    // Sal is still on the line from the call — tapping plays his ward reaction.
-    // (iOS Safari blocks auto-play of speech; a tap is required to unlock audio.)
-    function playWardVoice() {
-      var b = BEATS[current];
-      document.getElementById('wardPlayBtn').classList.add('hidden');
-      playAudio('sal-ch1-b' + (current + 1) + '-ward.mp3', b.ward.text);
-    }
-
-    function afterWard() {
-      stopAudio();
-      var b = BEATS[current];
-      if (b.reveal) {
-        document.getElementById('revealTitle').textContent = b.reveal.title;
-        document.getElementById('revealImage').textContent = b.reveal.image;
-        document.getElementById('revealCaption').textContent = b.reveal.caption;
-        showScreen('revealScreen');
-        return;
-      }
-      showCard();
-    }
-
-    function afterReveal() {
-      var b = BEATS[current];
-      // Beat 7: induction speech (voiced Sal screen) before the chapter-end doors.
-      if (b.induction) {
-        showSalMessage(b.induction, showCard, 'sal-ch1-b' + (current + 1) + '-induction.mp3');
-        return;
-      }
-      showCard();
-    }
-
+    /* ---------- puzzle ---------- */
     function showPuzzle() {
       var b = BEATS[current];
       document.getElementById('puzzleTitle').textContent = b.title;
@@ -691,17 +1058,18 @@
       document.getElementById('answerBox').value = '';
       document.getElementById('wrongMsg').classList.add('hidden');
       document.getElementById('hintText').classList.add('hidden');
+      var rr = document.getElementById('rereadLetterBtn');
+      if (b.showLetter) rr.classList.remove('hidden'); else rr.classList.add('hidden');
       showScreen('puzzleScreen');
     }
-
     function checkAnswer() {
       var b = BEATS[current];
       var guess = document.getElementById('answerBox').value.trim().toUpperCase();
       var ok = b.puzzle.answers.some(function (a) { return guess === a.toUpperCase(); });
-      if (ok) { afterPuzzleFlow(); }
-      else { document.getElementById('wrongMsg').classList.remove('hidden'); }
+      if (!ok) { document.getElementById('wrongMsg').classList.remove('hidden'); return; }
+      if (b.finale) { showNameAssembly(); return; }   // Beat 19: no followup clip
+      showSalMessage(b.followup, afterFollowup, b.id + '-followup.mp3');
     }
-
     function nextHint() {
       var hints = BEATS[current].puzzle.hints;
       var el = document.getElementById('hintText');
@@ -710,78 +1078,204 @@
       if (hintIndex < hints.length - 1) hintIndex++;
     }
 
-    function showCard() {
-      var b = BEATS[current];
-      if (b.chapterEnd) {
-        document.getElementById('chapterEndHeading').textContent = b.chapterEnd.heading || 'CHAPTER COMPLETE';
-        document.getElementById('chapterEndText').textContent = b.chapterEnd.text;
-        document.getElementById('doorContinue').classList.remove('hidden');
-        document.getElementById('doorPause').classList.remove('hidden');
-        document.getElementById('doorTorch').classList.remove('hidden');
-        showScreen('chapterEnd');
-        return;
-      }
-      document.getElementById('cardText').textContent = b.card;
-      showScreen('cardScreen');
+    /* ---------- the step queue (what happens after the followup) ---------- */
+    function afterFollowup() {
+      stepQueue = (BEATS[current].steps || []).slice();
+      nextStep();
+    }
+    function nextStep() {
+      stopAudio();
+      if (stepQueue.length === 0) { showCard(); return; }
+      var step = stepQueue.shift();
+      if (step === 'ward')   { showWard();       return; }
+      if (step === 'piece')  { showPiece();      return; }
+      if (step === 'letter') { showLetterCard(); return; }
+      if (step === 'noshow') { showNoShow();     return; }
+      if (step === 'break')  { showChapterEnd(); return; }
+      nextStep();
     }
 
-    // DOOR A: carry on into the next beat (uses the chapterEnd continueCard as the direction).
+    /* ---------- ward reveal (intact / relit / destroyed) ---------- */
+    function markSVG(color, opts) {
+      opts = opts || {};
+      var ring = opts.dashed
+        ? '<circle cx="40" cy="40" r="34" fill="none" stroke="' + color + '" stroke-width="4" stroke-dasharray="10 7"/>'
+        : '<circle cx="40" cy="40" r="34" fill="none" stroke="' + color + '" stroke-width="4"/>';
+      var yOpacity = opts.faded ? '0.45' : '1';
+      var strike = opts.strike
+        ? '<path d="M14 66 L66 14" stroke="' + color + '" stroke-width="5" stroke-linecap="round"/>'
+        : '';
+      return '<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
+        ring +
+        '<path d="M40 42 L40 64 M40 42 L24 20 M40 42 L56 20" fill="none" stroke="' + color +
+        '" stroke-width="4" stroke-linecap="round" opacity="' + yOpacity + '"/>' +
+        strike + '</svg>';
+    }
+    function showWard() {
+      var b = BEATS[current];
+      var card = document.getElementById('wardCard');
+      var sym = document.getElementById('wardSymbol');
+      card.className = 'ward';
+      var label, color, svgOpts = {};
+      if (b.ward.state === 'relit') {
+        card.classList.add('ward-relit'); color = '#c9a45c'; label = 'ward relit';
+      } else if (b.ward.state === 'destroyed') {
+        card.classList.add('ward-destroyed'); color = '#a06a6a'; label = 'ward destroyed';
+        svgOpts = { dashed: true, faded: true, strike: true };
+      } else {
+        card.classList.add('ward-intact'); color = '#8fb98f'; label = 'ward holds';
+      }
+      sym.innerHTML = markSVG(color, svgOpts);
+      document.getElementById('wardStateLabel').textContent = label;
+      document.getElementById('wardText').textContent = b.ward.text;
+      showScreen('wardScreen');
+    }
+
+    /* ---------- piece reveal ---------- */
+    function showPiece() {
+      var b = BEATS[current];
+      var n = b.piece;               // 1–5
+      pieces[n - 1] = true;
+      saveProgress(current);
+      document.getElementById('pieceTitle').textContent = 'A PIECE OF THE RITE \u2014 ' + n + ' OF 5';
+      document.getElementById('pieceGlyph').innerHTML = glyphSVG(n - 1, '#c9a45c');
+      document.getElementById('pieceCaption').textContent = PIECE_CAPTIONS[n - 1];
+      showScreen('pieceScreen');
+    }
+
+    /* ---------- the letter (Beat 13) ---------- */
+    function showLetterCard() {
+      showScreen('letterCardScreen');
+    }
+    function openTheLetter() {
+      // The tap on the envelope is the user gesture that unlocks audio playback.
+      letterArchiveMode = false;
+      document.getElementById('letterBody').textContent = LETTER_TEXT;
+      document.getElementById('letterContinueBtn').classList.add('hidden');
+      document.getElementById('letterBackBtn').classList.add('hidden');
+      showScreen('letterScreen');
+      playAudio('ch2-b13-letter.mp3', LETTER_TEXT, function () {
+        document.getElementById('letterContinueBtn').classList.remove('hidden');
+      });
+    }
+    function afterLetter() {
+      stopAudio();
+      var b = BEATS[current];
+      showSalMessage(b.postletter, nextStep, 'ch2-b13-postletter.mp3');
+    }
+    function showLetter(archive) {
+      // Archive mode: re-reading the letter from the Beat 18 puzzle screen.
+      letterArchiveMode = !!archive;
+      document.getElementById('letterBody').textContent = LETTER_TEXT;
+      document.getElementById('letterContinueBtn').classList.add('hidden');
+      document.getElementById('letterBackBtn').classList.remove('hidden');
+      showScreen('letterScreen');
+    }
+    function backToPuzzle() {
+      stopAudio();
+      showPuzzle();
+    }
+
+    /* ---------- the no-show & the three doors (Beat 10) ---------- */
+    function showNoShow() {
+      var b = BEATS[current];
+      showSalMessage(b.noshow, nextStep, 'ch1-b10-noshow.mp3');
+    }
+    function showChapterEnd() {
+      var b = BEATS[current];
+      document.getElementById('chapterEndHeading').textContent = b.chapterEnd.heading;
+      document.getElementById('chapterEndText').textContent = b.chapterEnd.text;
+      showScreen('chapterEnd');
+    }
+    /* DOOR A: carry on — Sal's carry-on clip, then the trail continues. */
     function continueChapter() {
       var b = BEATS[current];
-      if (b.chapterEnd && b.chapterEnd.continueCard) {
-        document.getElementById('cardText').textContent = b.chapterEnd.continueCard;
-        showScreen('cardScreen');
-      } else {
-        nextBeat();
-      }
+      showSalMessage(b.chapterEnd.carryon, showCard, 'ch1-break-carryon.mp3');
     }
-
-    // DOOR B: pause — save progress, set the return flag, show the voiced pause farewell.
+    /* DOOR B: pause — save the NEXT beat, set the return flag, voiced farewell. */
     function pauseForToday() {
       var b = BEATS[current];
-      localStorage.setItem(SAVE_KEY, String(current + 1));
-      localStorage.setItem(RETURN_KEY, '1');
       var next = current + 1;
+      saveProgress(next);
+      localStorage.setItem(RETURN_KEY, '1');
       document.getElementById('salContinueBtn').textContent = 'RETURN TO THE TRAIL';
-      showSalMessage(b.chapterEnd.pauseFarewell, function () {
+      showSalMessage(b.chapterEnd.pause, function () {
         document.getElementById('salContinueBtn').textContent = 'CONTINUE';
         localStorage.removeItem(RETURN_KEY); // same-session return: skip the welcome-back
         loadBeat(next);
-      }, 'sal-ch1-end-pause.mp3');
+      }, 'ch1-break-pause.mp3');
     }
-
-    // DOOR C: pass the torch — save progress, set the return flag, show the voiced ending farewell.
+    /* DOOR C: pass the torch — same save, plus the write-once torch flag. */
     function passTheTorch() {
       var b = BEATS[current];
-      localStorage.setItem(SAVE_KEY, String(current + 1));
-      localStorage.setItem(RETURN_KEY, '1');
       var next = current + 1;
-      var msg = b.chapterEnd.torchFarewell +
+      saveProgress(next);
+      localStorage.setItem(RETURN_KEY, '1');
+      localStorage.setItem(TORCH_KEY, '1');   // write-once, separate from progress
+      var msg = b.chapterEnd.torch +
         " And listen \u2014 if you ever change your mind, I'd be glad to hear from you. The order keeps a place for you either way.";
-      // The continue button here reads "RETURN TO THE TRAIL" (set below) — a change of heart.
       document.getElementById('salContinueBtn').textContent = 'RETURN TO THE TRAIL';
       showSalMessage(msg, function () {
-        document.getElementById('salContinueBtn').textContent = 'CONTINUE'; // reset for other uses
+        document.getElementById('salContinueBtn').textContent = 'CONTINUE';
         localStorage.removeItem(RETURN_KEY); // same-session return: skip the welcome-back
         loadBeat(next);
-      }, 'sal-ch1-end-torch.mp3');
+      }, 'ch1-break-torch.mp3');
     }
 
+    /* ---------- direction card ---------- */
+    function showCard() {
+      stopAudio();
+      var next = current + 1;
+      if (next >= BEATS.length) { showScreen('endScreen'); return; }
+      document.getElementById('cardText').textContent = BEATS[next].directions;
+      showScreen('cardScreen');
+    }
     function nextBeat() { loadBeat(current + 1); }
 
-    function openMap() {
-      var g = BEATS[current].gps;
-      var a = document.createElement('a');
-      a.href = 'https://maps.google.com/?q=' + g.lat + ',' + g.lon;
-      a.target = '_blank';
-      a.rel = 'noopener';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+    /* ---------- the name & the burn (Beat 19) ---------- */
+    function showNameAssembly() {
+      var row = document.getElementById('nameRow');
+      row.classList.remove('charred');
+      var html = '';
+      for (var i = 0; i < 5; i++) {
+        if (pieces[i]) html += glyphSVG(i, '#c9a45c');
+      }
+      row.innerHTML = html;
+      document.getElementById('preburnBtn').classList.remove('hidden');
+      document.getElementById('preburnTranscript').classList.add('hidden');
+      document.getElementById('burnBtn').classList.add('hidden');
+      document.getElementById('finishBtn').classList.add('hidden');
+      showScreen('nameScreen');
+    }
+    function playPreburn() {
+      var b = BEATS[current];
+      var t = document.getElementById('preburnTranscript');
+      t.textContent = '"' + b.preburn + '"';
+      t.classList.remove('hidden');
+      document.getElementById('preburnBtn').classList.add('hidden');
+      playAudio('ch2-b19-preburn.mp3', b.preburn, function () {
+        document.getElementById('burnBtn').classList.remove('hidden');
+      });
+    }
+    function burnIt() {
+      var b = BEATS[current];
+      stopAudio();
+      document.getElementById('burnBtn').classList.add('hidden');
+      document.getElementById('nameRow').classList.add('charred');
+      // The tap is the user gesture — postburn plays over the blackening animation.
+      playAudio('ch2-b19-postburn.mp3', b.postburn, function () {
+        document.getElementById('finishBtn').classList.remove('hidden');
+      });
+    }
+    function finishHunt() {
+      stopAudio();
+      saveProgress(BEATS.length);   // complete — resume lands on the end screen
+      showScreen('endScreen');
     }
 
-    // On page load: if a save exists, offer resume and demote BEGIN.
+    /* ---------- page load ---------- */
     if (localStorage.getItem(SAVE_KEY) !== null) {
+      loadProgress();
       document.getElementById('resumeBtn').classList.remove('hidden');
       var bb = document.getElementById('beginBtn');
       bb.textContent = 'START A NEW TRAIL';
@@ -792,5 +1286,3 @@
   </script>
 </body>
 </html>
-
-
