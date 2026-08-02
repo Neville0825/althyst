@@ -798,6 +798,7 @@
     var salAudioFile = null;
 
     var AUDIO_DIR = 'audio/';
+    var PLAYBACK_SPEED = 1.2;   // recorded clips play at this speed (1.0 = normal)
     var currentAudio = null;
     var audioWatchdog = null;
 
@@ -1034,6 +1035,7 @@
       audio.onended = function () { currentAudio = null; done(); };
       audio.onerror = fallback;
       currentAudio = audio;
+      audio.playbackRate = PLAYBACK_SPEED;
       var p = audio.play();
       if (p && typeof p.catch === 'function') { p.catch(fallback); }
     }
