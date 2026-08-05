@@ -165,7 +165,8 @@
       <div class="arrival-label">Where you're standing</div>
       <div id="arrivalText"></div>
     </div>
-    <button onclick="showCallScreen()">CONTINUE</button>
+   <button id="arrivalContinueBtn" onclick="showCallScreen()">CONTINUE</button>
+    <button class="hidden door-secondary" id="arrivalBackBtn" onclick="backToRiddle()">BACK TO THE RIDDLE</button>
   </div>
 
   <!-- INCOMING CALL (Sal's arrival call) -->
@@ -187,6 +188,7 @@
     <br>
     <button class="hintbtn" onclick="nextHint()">NEED A HINT?</button>
     <p class="hinttext hidden" id="hintText"></p>
+    <button class="smalllink" onclick="reviewFacts()">Review the building facts</button>
     <br>
     <button class="smalllink hidden" id="rereadLetterBtn" onclick="showLetter(true)">Read the stranger's letter again</button>
   </div>
@@ -276,7 +278,9 @@
       name, in the book, next to his. Where it belongs.<br><br>
       Walk seen&hellip; and go unseen.
     </p>
-    <button class="door-secondary" onclick="replayHunt()">START A NEW TRAIL</button>
+   <button onclick="window.location.href='../'">EXPLORE MORE CHICAGO HUNTS</button>
+    <br>
+    <button class="smalllink" onclick="replayHunt()">Walk this trail again</button>
   </div>
 
   <script>
@@ -787,6 +791,11 @@
     var stepQueue = [];
     var letterArchiveMode = false;
     var devMode = window.location.search.indexOf('dev=1') !== -1;
+    // Back-button trap: an accidental back tap or edge-swipe stays in the game.
+    history.pushState({ phoenix: true }, '');
+    window.addEventListener('popstate', function () {
+      history.pushState({ phoenix: true }, '');
+    });
 
     var SAVE_KEY   = 'althyst-phoenix-final-save';       // JSON: {b: beatIndex, p: [5 booleans]}
     var RETURN_KEY = 'althyst-phoenix-final-returning';  // '1' = deliberate stop, greet on return
@@ -972,17 +981,30 @@
       var mins = d.getHours() * 60 + d.getMinutes();
       return (day >= 1 && day <= 5 && mins >= (8 * 60 + 30) && mins < (17 * 60));
     }
-    function showArrivalNote() {
+    function currentArrivalNote() {
       var b = BEATS[current];
-      var note = b.arrivalNote;
       if (b.arrivalWeekday) {                     // Beat 1 day branch (text-only)
-        note = isWeekdayLobbyOpen() ? b.arrivalWeekday : b.arrivalWeekend;
+        return isWeekdayLobbyOpen() ? b.arrivalWeekday : b.arrivalWeekend;
       }
-      document.getElementById('arrivalTitle').textContent = b.title;
-      document.getElementById('arrivalText').textContent = note;
+      return b.arrivalNote;
+    }
+    function showArrivalNote() {
+      document.getElementById('arrivalTitle').textContent = BEATS[current].title;
+      document.getElementById('arrivalText').textContent = currentArrivalNote();
+      document.getElementById('arrivalContinueBtn').classList.remove('hidden');
+      document.getElementById('arrivalBackBtn').classList.add('hidden');
       showScreen('arrivalScreen');
     }
-
+    function reviewFacts() {
+      document.getElementById('arrivalTitle').textContent = BEATS[current].title;
+      document.getElementById('arrivalText').textContent = currentArrivalNote();
+      document.getElementById('arrivalContinueBtn').classList.add('hidden');
+      document.getElementById('arrivalBackBtn').classList.remove('hidden');
+      showScreen('arrivalScreen');
+    }
+    function backToRiddle() {
+      showScreen('puzzleScreen');
+    }
     /* ---------- Sal's call ---------- */
     function showCallScreen() {
       document.getElementById('playBtn').classList.remove('hidden');
