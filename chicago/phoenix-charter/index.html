@@ -792,9 +792,18 @@
     var letterArchiveMode = false;
     var devMode = window.location.search.indexOf('dev=1') !== -1;
     // Back-button trap: an accidental back tap or edge-swipe stays in the game.
-    history.pushState({ phoenix: true }, '');
+    // Two decoys deep; any back-step is immediately marched forward again.
+    history.pushState({ phoenix: 1 }, '');
+    history.pushState({ phoenix: 2 }, '');
     window.addEventListener('popstate', function () {
-      history.pushState({ phoenix: true }, '');
+      history.go(1);
+    });
+    // Safari back/forward restore: the page thaws from a snapshot but the GPS
+    // watch it had is dead. Notice the thaw and start a fresh watch.
+    window.addEventListener('pageshow', function (e) {
+      if (e.persisted && !document.getElementById('walking').classList.contains('hidden')) {
+        startGps();
+      }
     });
 
     var SAVE_KEY   = 'althyst-phoenix-final-save';       // JSON: {b: beatIndex, p: [5 booleans]}
@@ -955,7 +964,12 @@
     }
     function onGpsError() {
       document.getElementById('distanceText').textContent =
-        'Location permission needed \u2014 check browser settings.';
+        'Location hiccup \u2014 tap here to retry, or check browser settings.';
+      document.getElementById('distanceText').onclick = function () {
+        this.onclick = null;
+        this.textContent = 'Locating you\u2026';
+        startGps();
+      };
     }
     function arrive() {
       stopGps();
