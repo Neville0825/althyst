@@ -914,6 +914,11 @@
       document.getElementById('arrivedMsg').classList.add('hidden');
       document.getElementById('arriveBtn').classList.add('hidden');
       if (devMode) document.getElementById('devArrive').classList.remove('hidden');
+      // Dev only: reveal the CONTINUE buttons immediately instead of waiting for audio.
+      if (devMode) {
+        document.getElementById('afterVoiceBtn').classList.remove('hidden');
+        document.getElementById('salContinueBtn').classList.remove('hidden');
+      }
       var pi = document.getElementById('piecesIndicator');
       if (piecesCount() > 0) {
         pi.textContent = 'PIECES OF THE RITE \u00b7 ' + piecesCount() + ' / 5';
