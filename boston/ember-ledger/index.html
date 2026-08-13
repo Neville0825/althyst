@@ -83,6 +83,8 @@
       3 chapters &middot; 2 to 6 hours &middot; pause anytime<br>
       Best for groups of 2&ndash;5 &middot; ages 10+
     </p>
+    <p class="distance-note">Voice messages play out loud &mdash; turn your ringer on.
+      On iPhone, the side switch mutes them.</p>
     <p class="story">
       On a storm-wrecked January night in 1764, Harvard's library burned
       to the ground. Five thousand books &mdash; a century of secrets &mdash;
@@ -148,6 +150,8 @@
 <div class="screen hidden" id="chapterEnd">
     <h2 id="chapterEndHeading">CHAPTER COMPLETE</h2>
     <p class="story" id="chapterEndText"></p>
+    <button class="hintbtn hidden" id="chapterPlayBtn" onclick="playChapterVoice()">&#9654; PLAY MESSAGE</button>
+    <br>
     <button id="chapterContinueBtn" onclick="continueChapter()">CONTINUE THE TRAIL</button>
     <br>
     <button class="hintbtn" id="chapterStopBtn" onclick="stopForToday()">RETURN ANOTHER DAY</button>
@@ -164,6 +168,7 @@
         gps: { lat: 42.3733, lon: -71.1190, radius: 50 },
         voiceTitle: "INCOMING CALL — UNKNOWN NUMBER",
         voice: "Don't hang up. You're standing in Harvard Square. I can see the check-in. Good. Listen: in 1764, Harvard's library burned. Every book, gone. That's what the histories say. The histories are wrong. One volume left that building before the flames took it. A ledger of debts and secrets that powerful families needed erased. The woman who saved it walked the same stones you're standing on. I've spent thirty years finding her trail. Today, you're going to walk it. Enter the Yard the way the Keepers commanded: through the gate that tells you why you've come.",
+        audio: "audio/1-1-kiosk.mp3",
         puzzle: null,
         card: "Walk south along Massachusetts Avenue, keeping the Yard's brick wall on your left, until you reach a gate crowned with carved words about wisdom. Read them before you enter."
       },
@@ -173,6 +178,7 @@
         gps: { lat: 42.3722, lon: -71.1167, radius: 40 },
         voiceTitle: "THE THRESHOLD",
         voice: "Every secret society needs a front door. The Keepers hid theirs in plain sight. A gate thousands of students pass daily without reading. Above you, the instruction. The Keepers loved that you only understand the price of wisdom after you've entered.",
+        audio: "audio/1-2-dexter-gate.mp3",
         puzzle: {
           prompt: "The Keepers' password is the last word you read before entering. Speak it.",
           answers: ["WISDOM"],
@@ -190,6 +196,7 @@
         gps: { lat: 42.3744, lon: -71.1172, radius: 40 },
         voiceTitle: "THE FIRST LESSON",
         voice: "Meet John Harvard. Except that's the first lie. The sculptor never saw John Harvard. He used a student as the model. Lie two: the inscription calls him Founder. He wasn't. He was a donor. Lie three: read the date. The college was founded in 1636, not what the pedestal claims. The Keepers adored this statue. Their first lesson: the official record lies. Your job is to find what's true.",
+        audio: "audio/1-3-three-lies.mp3",
         puzzle: {
           prompt: "The pedestal shows a false year. Enter the TRUE year Harvard was founded — the year the ledger's story begins.",
           answers: ["1636"],
@@ -207,6 +214,7 @@
         gps: { lat: 42.3748, lon: -71.1182, radius: 40 },
         voiceTitle: "THE FIRE",
         voice: "January 24th, 1764. A nor'easter howling. Sometime past midnight, a spark from the hearth found the timbers. The finest library in the colonies. Five thousand volumes. A century of collecting. Gone before dawn. Every book burned. Except one. She came out through the smoke with it wrapped in her cloak, and the men who wanted that ledger destroyed spent the next fifty years insisting it never existed. The building in front of you rose from those ashes two years later. The Keepers marked it.",
+        audio: "audio/1-4-harvard-hall.mp3",
         puzzle: {
           prompt: "The hall was reborn from the ashes. The fire was 1764. Enter the year of the hall's rebirth.",
           answers: ["1766"],
@@ -224,6 +232,7 @@
         gps: { lat: 42.3752, lon: -71.1180, radius: 40 },
         voiceTitle: "THE WITNESSES",
         voice: "Holden Chapel. 1744, and barely changed since. Students called it a solitary English daisy in a field of Yankee dandelions. She crouched in its doorway that night, catching her breath while the fire brigades ran past. And when she looked up, she found she was not alone. Faces. Carved faces, watching her from the crest above the door. The only witnesses to what she carried. The Keepers never forgot it. To this day, their oath of secrecy ends with the same words: as the witnesses watched, and said nothing.",
+        audio: "audio/1-5-holden-chapel.mp3",
         puzzle: {
           prompt: "Look up at the crest above the chapel door. How many carved witnesses watched her that night? Count the cherubs.",
           answers: ["3", "THREE"],
@@ -241,6 +250,7 @@
         gps: { lat: 42.3751, lon: -71.1199, radius: 50 },
         voiceTitle: "INCOMING CALL — PROFESSOR QUILL",
         voice: "You're among them now. Harvard presidents. Revolutionary soldiers. Enslaved men who fought for a freedom they were denied. Walk gently here — these are the first Keepers of all. She knew the sexton of this ground, and he became the first sworn Keeper. Before dawn he carved a mark for her. Not on a grave — that would be sacrilege. On the stone that told travelers where they stood. Distance and direction. A navigator's blessing. Find the old milestone and read what it promises.",
+        audio: "audio/1-6-burying-ground.mp3",
         puzzle: {
           prompt: "The milestone measures the road to Boston. How many miles did it promise?",
           answers: ["8", "EIGHT"],
@@ -258,6 +268,7 @@
         gps: { lat: 42.3745, lon: -71.1224, radius: 40 },
         voiceTitle: "THE SMITH'S SECRET",
         voice: "Under a spreading chestnut tree, the village smithy stands. Longfellow wrote those lines about this very spot. About the blacksmith Dexter Pratt, whose forge stood here. But the Keepers knew an older story. The smith's grandfather took a burned book from a shaking librarian's hands one January night, and swore his family to silence. Longfellow's poem wasn't just verse. It was a signpost. The Keepers hid her hiding place inside the most famous poem in America.",
+        audio: "audio/1-7-blacksmith.mp3",
         puzzle: {
           prompt: "The poem hides the trail. 'UNDER a spreading chestnut-tree...' The Keepers meant that first word literally: the smith kept the ledger fragment UNDER something. What stood above the hiding place?",
           answers: ["TREE", "THE TREE", "CHESTNUT", "CHESTNUT TREE", "THE CHESTNUT TREE", "A CHESTNUT TREE"],
@@ -275,6 +286,7 @@
         gps: { lat: 42.3770, lon: -71.1264, radius: 45 },
         voiceTitle: "THE MARGINAL NOTE",
         voice: "Two headquarters, one street. Washington commanded the siege of Boston from this house, and seventy years later, Longfellow wrote at the same windows. Somewhere between the general and the poet, the ledger fragment the blacksmith guarded came into this house. And Longfellow found a note, scrawled in a book's margin, that told him what he was holding. He spent the rest of his life quietly scattering the fragments where only the worthy would find them. You recovered his trail today. Now recover the fragment.",
+        audio: "audio/1-8-longfellow-house.mp3",
         puzzle: {
           prompt: "The Keepers left the final count in plain sight. Count the tall white pilasters — the flat columns — across the front face of the poet's house, visible from where you stand.",
           answers: ["4", "FOUR"],
@@ -291,6 +303,7 @@
           caption: "Burned at the edges. Sealed with the surveyor's mark. Fragment one of the Ember Ledger is yours."
         },
         chapterEnd: {
+          audio: "audio/1-9-chapter-one-complete.mp3",
           heading: "CHAPTER ONE COMPLETE",
           text: "You have it. You actually have it. Fragment one of the Ember Ledger — and the name history erased. The college records list her only as 'a servant of the library.' The Keepers knew her name: Constance Reed. The note in the margin says the second fragment went to the garden of the dead, where the Navigator rests. I know where that is. The question is whether you have another journey in you today. It's a short bus or rideshare hop west — or rest, and the trail will keep. Constance waited fifty years. There's no shame in resting. Only in forgetting.",
         }
@@ -301,6 +314,7 @@
         gps: { lat: 42.3714, lon: -71.1446, radius: 60 },
         voiceTitle: "THE THRESHOLD OF THE DEAD",
         voice: "In 1831, they built a gate unlike anything in America. Egyptian. Ancient. Deliberately strange. The Keepers chose this place because a cemetery is the one archive no one dares to burn. Do not pass through yet. Stand before the gate and look up at the words carved in the stone. The founders left the first instruction in plain sight — and the Keepers demand you speak it before you enter.",
+        audio: "audio/2-1-egyptian-gateway.mp3",
         puzzle: {
           prompt: "The Keeper's rule: what is burned is not destroyed — it only ___. Find the fifth word carved in the stone above the gateway and speak it to enter.",
           answers: ["RETURN", "RETURNS"],
@@ -318,6 +332,7 @@
         gps: { lat: 42.3706, lon: -71.1447, radius: 45 },
         voiceTitle: "INCOMING CALL — PROFESSOR QUILL",
         voice: "You found it? Good. Most people walk right past a fifteen-ton sphinx, if you can believe that. It's a Civil War memorial, carved from a single block of granite. But the Keepers loved a riddle. Two faces, two languages, one truth. Walk around her. One side speaks English. The sphinx only lets you pass if you answer what she guards the memory of.",
+        audio: "audio/2-2-sphinx.mp3",
         puzzle: {
           prompt: "The sphinx asks: what did the great people preserve? Answer in one word.",
           answers: ["UNION", "THE UNION", "AMERICAN UNION"],
@@ -335,6 +350,7 @@
         gps: { lat: 42.3712, lon: -71.1438, radius: 45 },
         voiceTitle: "THE MAN WHO FOUND THE WAY",
         voice: "Meet Nathaniel Bowditch. The man who taught America's sailors to find their way home. Self-taught. Brilliant. And in our story, the man the Keepers trusted to hide the ledger's map. A navigator never writes a location. He writes a bearing. Look closely at the bronze. His dates hold the number you need.",
+        audio: "audio/2-3-navigator.mp3",
         puzzle: {
           prompt: "The Navigator's code: subtract the year of his birth from the year of his death. That number opens the Keeper's next record.",
           answers: ["65", "SIXTY-FIVE", "SIXTY FIVE"],
@@ -357,6 +373,7 @@
         gps: { lat: 42.3699, lon: -71.1452, radius: 50 },
         voiceTitle: "INCOMING CALL — UNKNOWN. OLDER.",
         voice: "You're standing in the Dell now, aren't you. I can almost hear the quiet from here. In 1831 they consecrated this ground. A natural bowl the glaciers carved ten thousand years before Harvard ever burned. Listen to me carefully, because I will only say this once. The librarian who saved the ledger from the flames. Constance Reed. She is buried on the ridge above you. Not under her own name. The Keepers gave her a poet for a guardian. Climb to Indian Ridge Path. Find the poet everyone knows. She rests in his shadow.",
+        audio: "audio/2-4-consecration-dell.mp3",
         puzzle: null,
         card: "The Keeper's words were your directions. Climb out of the Dell on its western slope and find Indian Ridge Path running along the high ground. Walk the ridge until you find the name every American schoolchild once recited: LONGFELLOW."
       },
@@ -366,6 +383,7 @@
         gps: { lat: 42.3702, lon: -71.1461, radius: 45 },
         voiceTitle: "THE GUARDIAN",
         voice: "Henry Wadsworth Longfellow. You stood outside his house today. The house where he found the note in the margin. He spent forty years quietly protecting the Keeper's secret, and when he died, they buried the librarian's memory beside his. The stone in front of you holds a year. That year is the key.",
+        audio: "audio/2-5-poets-shadow.mp3",
         puzzle: {
           prompt: "The Keeper's cipher needs the year the poet was born. Find it on the family stone and enter it.",
           answers: ["1807"],
@@ -383,6 +401,7 @@
         gps: { lat: 42.3697, lon: -71.1441, radius: 50 },
         voiceTitle: "THE PILGRIMAGE ENDS",
         voice: "Stand where the living look out over everything the dead protect. From this hill you can see the whole board. Harvard, where it burned. Boston, where the Tories fled. And across the river, the towers of the makers, where the final page waits. You did what pilgrims have always done today. You walked. You read the stones. You kept your voices low among the sleeping. And you found the poet's shadow, and the truth resting inside it. Fragment two is yours.",
+        audio: "audio/2-6-washington-tower.mp3",
         puzzle: null,
         card: "",
         reveal: {
@@ -391,6 +410,7 @@
           caption: "Pulled from the garden of the dead. The surveyor's mark again, fainter this time. Fragment two of the Ember Ledger is yours."
         },
         chapterEnd: {
+          audio: "audio/2-7-chapter-two-complete.mp3",
           heading: "CHAPTER TWO COMPLETE",
           text: "Two fragments of the Ember Ledger ride in your pocket — more than anyone has held since Longfellow himself. The Keepers had a phrase for travelers like you: worthy of the road. The final page lies with the makers of new things — a bus or rideshare back to Harvard Square, then the Red Line east. Continue... or return another day? The ledger has waited 250 years. It can wait for you.",
           farewell: "Chapter Two complete. Two fragments recovered. The ledger remembers. When you return, the way runs east, by rail. Until then — the dead will keep your secret. They are very, very good at that."
@@ -402,6 +422,7 @@
         gps: { lat: 42.3734, lon: -71.1189, radius: 70 },
         voiceTitle: "THE WHOLE STORY — LISTEN AS YOU RIDE",
         voice: "Board the inbound train toward Kendall. Two stops. And while the tunnel swallows you, let me finally tell it start to finish. January, 1764. Constance Reed, twenty-three years old, a servant of the library nobody looked at twice. When the fire took the stacks she went in, not out, and came through the smoke with the one book that mattered wrapped in her cloak. The blacksmith hid it. The sexton swore the first oath. For fifty years she moved the fragments, one step ahead of the families whose forged debts filled its pages. She died free, and unknown, and the trail slept until a poet found a note in a margin. Longfellow scattered the fragments anew. And when the world turned modern, the last Keeper was not a poet. He was an engineer. Professor Elias Marsh. Brilliant. Paranoid. Dying in 1962 with no successor, he spent his final years hiding the last page inside a puzzle only strangers could solve. Because strangers, he said, were the only people he could trust. Get off at Kendall. You're going to meet him.",
+        audio: "audio/3-1-ride-east.mp3",
         puzzle: null,
         card: "Ride the Red Line inbound two stops to Kendall MIT. When you surface, stay near the station plaza — the trail resumes the moment you arrive."
       },
@@ -411,6 +432,7 @@
         gps: { lat: 42.3625, lon: -71.0862, radius: 60 },
         voiceTitle: "INCOMING CALL — PROFESSOR QUILL",
         voice: "You're in Marsh's world now. Did you notice, down between the tracks? Bells. A ring. A sheet of steel. A sculptor hung them there in 1987, played by levers on the platform. The instruments are named for Pythagoras, Kepler, and Galileo. And here's a Keeper's joke for you: Marsh's cipher key is not among them. He chose someone far closer to home. You'll see. Now come — Marsh's trail starts at the strangest building in Cambridge.",
+        audio: "audio/3-2-kendall-station.mp3",
         puzzle: null,
         card: "From the station plaza, walk west along Main Street. Within a few minutes the buildings stop behaving: walls lean, towers crumple, windows tilt like the whole block is mid-thought. That is the Stata Center. Marsh would have hated it. That's exactly why the trail goes through it."
       },
@@ -420,6 +442,7 @@
         gps: { lat: 42.3616, lon: -71.0906, radius: 60 },
         voiceTitle: "MARSH'S LESSON",
         voice: "Frank Gehry designed this in 2004. A building that looks like it's collapsing and never does. Remember the statue in Harvard Yard? Three lies in bronze. The Keepers' first lesson: the record lies. Marsh's version of the lesson stands in front of you. Things that look wrong can be perfectly sound. And things that look sound can be perfectly wrong. Find the building's true name — it wears it plainly, even while everything else about it refuses to be plain.",
+        audio: "audio/3-3-building-that-lies.mp3",
         puzzle: {
           prompt: "The crooked building tells one straight fact: the family name of the couple it honors. Find the sign and enter that name.",
           answers: ["STATA", "THE STATA CENTER", "STATA CENTER"],
@@ -437,6 +460,7 @@
         gps: { lat: 42.3591, lon: -71.0917, radius: 70 },
         voiceTitle: "THE MISSING IMMORTAL",
         voice: "Carved into the marble around this court are the names of the giants. The thinkers MIT declared immortal in 1916. Marsh lectured beneath them for decades, and his note to the Keepers begins here. Among the immortals stands one born a few miles from this court. A boy who ran barefoot through colonial Boston and, if the Keepers' oldest records are true, once held a page of the ledger in his own ink-stained hands. He is the key. But first, prove you can read the founders' stone. The great dome bears a year, written the old way. Look up beneath the dome.",
+        audio: "audio/3-4-killian-court.mp3",
         puzzle: {
           prompt: "Decode the year carved the old way beneath the dome — M is 1000, D is 500, C is 100, L is 50, X is 10, I is 1. Enter it as a modern number.",
           answers: ["1861"],
@@ -454,6 +478,7 @@
         gps: { lat: 42.3592, lon: -71.0932, radius: 50 },
         voiceTitle: "BUILDING SEVEN",
         voice: "Seventy-seven Massachusetts Avenue. The front door of the Institute. Ten columns and a limestone face that has watched a century of geniuses hurry past. High on this building, the carvers set more immortal names. Marsh's American is among them. Born on Milk Street in Boston in 1706. A runaway printer's apprentice who became the most famous man in the world. And who, the Keepers' oldest records claim, once held a page of the ledger in his own ink-stained hands. Find his name and speak it.",
+        audio: "audio/3-5-runaway-apprentice.mp3",
         puzzle: {
           prompt: "Search the names carved high on this building for the one figure born in colonial Boston. Enter his name.",
           answers: ["FRANKLIN", "BEN FRANKLIN", "BENJAMIN FRANKLIN"],
@@ -471,6 +496,7 @@
         gps: { lat: 42.3591, lon: -71.0940, radius: 45 },
         voiceTitle: "THE MAN MADE OF NUMBERS",
         voice: "There he sits. A thinker built from digits and symbols, hollow and glowing, holding his own head together with mathematics. The sculptor made him in 2011. But the Keepers say Marsh dreamed him fifty years early. This is Marsh's self-portrait, arriving two generations late. A man who became his numbers. Look through him — because the answer to the Keepers' question is the sculpture itself.",
+        audio: "audio/3-6-alchemist.mp3",
         puzzle: {
           prompt: "The Keepers ask: look closely — what is the Alchemist made of?",
           answers: ["NUMBERS", "DIGITS", "NUMERALS", "MATH", "NUMBERS AND SYMBOLS"],
@@ -488,6 +514,7 @@
         gps: { lat: 42.3547, lon: -71.0910, radius: 60 },
         voiceTitle: "HALFWAY TO EVERYTHING",
         voice: "Stand at the halfway mark. Boston in front of you. Cambridge at your back. The river running to the sea beneath your feet. Constance Reed crossed this river in a rowboat with a burned book under her cloak. Two hundred and sixty years later, you stand above it holding everything she saved. Marsh adored this bridge. A man who became a unit of measure. He wrote that it was the most honest monument in Boston. The bridge's full length is painted at its end — a number of smoots, plus one small extra measure.",
+        audio: "audio/3-7-last-measure.mp3",
         puzzle: {
           prompt: "How many smoots long is the bridge? Enter the number (the ear is a bonus).",
           answers: ["364.4", "364", "364.4 SMOOTS", "364 SMOOTS"],
@@ -504,6 +531,7 @@
           caption: "The last page. The mark is bold here — Marsh wanted it seen. Three fragments. The Ember Ledger, whole again after 260 years."
         },
         chapterEnd: {
+          audio: "audio/3-8-finale.mp3",
           heading: "THE EMBER LEDGER — COMPLETE",
           finale: true,
           text: "It's names. Pages and pages of names — every family the Tories ruined with forged debts and stolen surveys. Every farm taken with false paper. Constance couldn't fight them. So she did the one thing power can't survive: she kept the receipts. That's the treasure. Not gold. The record, kept true. The Keepers' oath was three words: measure it honestly. As of today, that's your oath too. Congratulations, Keeper. Oh — one more thing. The surveyor's mark. You saw its shadow on this trail. It doesn't only appear in Cambridge. If you ever find yourself in Back Bay, or the North End, or Downtown... keep your eyes open. Constance's ledger had four volumes.",
@@ -606,6 +634,7 @@
     }
 
     function showStoryScreen() {
+      stopVoice();
       var b = BEATS[current];
       document.getElementById('storyTitle').textContent = b.voiceTitle;
       document.getElementById('playBtn').classList.remove('hidden');
@@ -614,25 +643,117 @@
       showScreen('storyScreen');
     }
 
+    /* ------------------------------------------------------------------
+       VOICE PLAYBACK
+       Plays the real recording named in each beat's "audio" field.
+       If that file is missing, misnamed, or refuses to load, a 4-second
+       watchdog quietly falls back to the phone's built-in robot voice,
+       so a player is never stranded at a dead button.
+       ------------------------------------------------------------------ */
+    var currentAudio = null;
+    var voiceWatchdog = null;
+    var voiceSafetyNet = null;
+
+    function clearVoiceTimers() {
+      if (voiceWatchdog) { clearTimeout(voiceWatchdog); voiceWatchdog = null; }
+      if (voiceSafetyNet) { clearTimeout(voiceSafetyNet); voiceSafetyNet = null; }
+    }
+
+    function revealContinue() {
+      document.getElementById('afterVoiceBtn').classList.remove('hidden');
+    }
+
+    function stopVoice() {
+      clearVoiceTimers();
+      if (currentAudio) {
+        try { currentAudio.pause(); } catch (e) {}
+        currentAudio = null;
+      }
+      if ('speechSynthesis' in window) {
+        try { speechSynthesis.cancel(); } catch (e) {}
+      }
+    }
+
+    function speakFallback(text) {
+      if ('speechSynthesis' in window) {
+        try { speechSynthesis.cancel(); } catch (e) {}
+        var msg = new SpeechSynthesisUtterance(text);
+        msg.rate = 0.95;
+        msg.onend = revealContinue;
+        msg.onerror = revealContinue;
+        speechSynthesis.speak(msg);
+      } else {
+        revealContinue();
+      }
+    }
+
     function playVoice() {
       var b = BEATS[current];
       var t = document.getElementById('transcript');
       t.textContent = '"' + b.voice + '"';
       t.classList.remove('hidden');
       document.getElementById('playBtn').classList.add('hidden');
-      if ('speechSynthesis' in window) {
-        var msg = new SpeechSynthesisUtterance(b.voice);
-        msg.rate = 0.95;
-        msg.onend = function () {
-          document.getElementById('afterVoiceBtn').classList.remove('hidden');
-        };
-        speechSynthesis.speak(msg);
-      } else {
-        document.getElementById('afterVoiceBtn').classList.remove('hidden');
+      stopVoice();
+
+      if (!b.audio) { speakFallback(b.voice); return; }
+
+      var switched = false;
+      function fallback() {
+        if (switched) return;
+        switched = true;
+        clearVoiceTimers();
+        if (currentAudio) { try { currentAudio.pause(); } catch (e) {} currentAudio = null; }
+        speakFallback(b.voice);
+      }
+
+      var a = new Audio();
+      currentAudio = a;
+
+      a.onloadedmetadata = function () {
+        /* The file exists and is playable — call off the watchdog, and set a
+           long safety net so a mid-stream stall can never trap the player. */
+        clearVoiceTimers();
+        switched = true;
+        var wait = (isFinite(a.duration) ? a.duration * 1.5 : 180) + 20;
+        voiceSafetyNet = setTimeout(revealContinue, wait * 1000);
+      };
+      a.onended = function () { clearVoiceTimers(); revealContinue(); };
+      a.onerror = fallback;
+
+      voiceWatchdog = setTimeout(fallback, 4000);
+      a.src = b.audio;
+
+      var pr = a.play();
+      if (pr && typeof pr.catch === 'function') {
+        pr.catch(function () { if (!switched) { fallback(); } else { revealContinue(); } });
+      }
+    }
+
+    /* Chapter-end and finale speeches. The button only appears if the file
+       is actually there, so unrecorded chapter ends stay text-only. */
+    var chapterAudio = null;
+
+    function stopChapterVoice() {
+      if (chapterAudio) { try { chapterAudio.pause(); } catch (e) {} chapterAudio = null; }
+    }
+
+    function playChapterVoice() {
+      var b = BEATS[current];
+      if (!b.chapterEnd || !b.chapterEnd.audio) return;
+      var btn = document.getElementById('chapterPlayBtn');
+      stopChapterVoice();
+      btn.textContent = '\u25B6 PLAYING\u2026';
+      chapterAudio = new Audio(b.chapterEnd.audio);
+      chapterAudio.onended = function () { btn.textContent = '\u25B6 PLAY AGAIN'; };
+      chapterAudio.onerror = function () { btn.classList.add('hidden'); };
+      var pr = chapterAudio.play();
+      if (pr && typeof pr.catch === 'function') {
+        pr.catch(function () { btn.textContent = '\u25B6 PLAY MESSAGE'; });
       }
     }
 
     function afterVoice() {
+      stopVoice();
       var b = BEATS[current];
       if (b.puzzle) { showPuzzle(); } else { proceedAfterSolve(); }
     }
@@ -681,6 +802,16 @@
           b.chapterEnd.heading || 'CHAPTER COMPLETE';
         document.getElementById('chapterEndText').textContent = b.chapterEnd.text;
         document.getElementById('farewellText').classList.add('hidden');
+        stopChapterVoice();
+        var cpb = document.getElementById('chapterPlayBtn');
+        cpb.classList.add('hidden');
+        cpb.textContent = '\u25B6 PLAY MESSAGE';
+        if (b.chapterEnd.audio) {
+          var probe = new Audio();
+          probe.preload = 'metadata';
+          probe.onloadedmetadata = function () { cpb.classList.remove('hidden'); };
+          probe.src = b.chapterEnd.audio;
+        }
         var cb = document.getElementById('chapterContinueBtn');
         var sb = document.getElementById('chapterStopBtn');
         if (b.chapterEnd.finale) {
@@ -697,7 +828,7 @@
       showScreen('cardScreen');
     }
 
-    function continueChapter() { loadBeat(current + 1); }
+    function continueChapter() { stopChapterVoice(); loadBeat(current + 1); }
 
     function stopForToday() {
       var b = BEATS[current];
