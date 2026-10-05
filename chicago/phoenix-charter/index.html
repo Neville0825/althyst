@@ -163,6 +163,7 @@
     <br>
     <button class="hintbtn" id="mapBtn" onclick="openMap()">SHOW ME ON THE MAP</button>
     <button class="devbtn hidden" id="devArrive" onclick="arrive()">[dev] simulate arrival</button>
+        <button class="smalllink" onclick="reportProblem()">Something’s wrong here</button>
     <div class="pieces-indicator hidden" id="piecesIndicator"></div>
   </div>
 
@@ -199,6 +200,9 @@
     <button class="smalllink" onclick="reviewFacts()">Review the building facts</button>
     <br>
     <button class="smalllink hidden" id="rereadLetterBtn" onclick="showLetter(true)">Read the stranger's letter again</button>
+
+        <button class="smalllink" onclick="reportProblem()">Something’s wrong here</button>
+    
   </div>
 
   <!-- REUSABLE SAL MESSAGE -->
@@ -810,7 +814,23 @@
         startGps();
       }
     });
+    /* ---------- problem report ---------- */
+    var REPORT_FORM   = 'https://docs.google.com/forms/d/e/1FAIpQLSfZGJ8lBGFK8gQKwf5PGP8I705cokNjawnX4bDvuHT4wrarDA/viewform?usp=pp_url';
+    var REPORT_STOP   = 'entry.1492494671';
+    var REPORT_DEVICE = 'entry.1077996512';
 
+    function reportProblem() {
+      var b = BEATS[current] || {};
+      var stop = (b.id || '?') + ' / ' + (b.title || '?');
+      var device = navigator.userAgent + ' | screen ' + window.screen.width + 'x' + window.screen.height;
+      window.open(
+        REPORT_FORM +
+        '&' + REPORT_STOP   + '=' + encodeURIComponent(stop) +
+        '&' + REPORT_DEVICE + '=' + encodeURIComponent(device),
+        '_blank'
+      );
+    }
+    
     /* ---------- save / load ---------- */
     function saveProgress(beatIndex) {
       localStorage.setItem(SAVE_KEY, JSON.stringify({ b: beatIndex, p: pieces }));
