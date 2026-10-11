@@ -290,6 +290,12 @@
       name, in the book, next to his. Where it belongs.<br><br>
       Walk seen&hellip; and go unseen.
     </p>
+        <p class="distance-note" style="margin-top:22px; line-height:1.6;">
+      You are one of the first people ever to walk this trail.
+      Two minutes of your thoughts would mean a great deal.
+    </p>
+    <button onclick="openSurvey()">TELL ME HOW IT WENT</button>
+    <br>
     <button onclick="window.location.href='../'">EXPLORE MORE CHICAGO HUNTS</button>
     <br>
     <button class="smalllink" onclick="replayHunt()">Walk this trail again</button>
@@ -814,6 +820,13 @@
         startGps();
       }
     });
+
+        /* ---------- post-hunt survey ---------- */
+    var SURVEY_FORM = 'https://docs.google.com/forms/d/e/1FAIpQLScsnmg_vGAeLUz1v3VeY4-FWI7P_NgJOOBubOfuGfQJP6aiQQ/viewform';
+
+    function openSurvey() {
+      window.open(SURVEY_FORM, '_blank');
+    }
     /* ---------- problem report ---------- */
     var REPORT_FORM   = 'https://docs.google.com/forms/d/e/1FAIpQLSfZGJ8lBGFK8gQKwf5PGP8I705cokNjawnX4bDvuHT4wrarDA/viewform?usp=pp_url';
     var REPORT_STOP   = 'entry.1492494671';
